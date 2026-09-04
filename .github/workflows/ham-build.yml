@@ -68,6 +68,9 @@ jobs:
     env:
       VERSION: ${{ needs.version.outputs.version }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # gh resolves a fork checkout to its parent repository by default; pin it
+      # to this fork so releases are created and pruned here, never upstream.
+      GH_REPO: ${{ github.repository }}
     steps:
       - uses: actions/checkout@v7
         with:
