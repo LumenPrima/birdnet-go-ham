@@ -44,7 +44,18 @@ export interface SpectrogramAnalyserOptions {
   audioOutput?: boolean;
   /** Gain in dB (default: 0) */
   gainDb?: number;
+  /** Optional processing block between the rumble filter and the gain (see AnalyserInsert). */
+  insert?: AnalyserInsert;
+  /** Also expose an analyser tapped before the insert, for a pre/post comparison. */
+  preAnalyser?: boolean;
 }
+
+/**
+ * A processing block spliced into the analyser graph between its rumble filter and its gain:
+ * the returned input receives the source, the output feeds the rest of the chain. Used by the
+ * equalizer monitor to run a browser-side mirror of the station's filters.
+ */
+export type AnalyserInsert = (ctx: AudioContext) => { input: AudioNode; output: AudioNode };
 
 const DEFAULT_FFT_SIZE = 1024;
 const HIGH_PASS_FREQ = 20;
@@ -62,6 +73,8 @@ export function useSpectrogramAnalyser(options?: SpectrogramAnalyserOptions) {
   // Reactive state (exposed to consumers)
   let analyser = $state<AnalyserNode | null>(null);
   let frequencyData = $state<Uint8Array<ArrayBuffer>>(new Uint8Array(binCount));
+  let preAnalyser = $state<AnalyserNode | null>(null);
+  let preFrequencyData = $state<Uint8Array<ArrayBuffer>>(new Uint8Array(binCount));
   let isActive = $state(false);
   let sampleRate = $state(48000);
   let audioOutput = $state(options?.audioOutput ?? false);
@@ -74,6 +87,9 @@ export function useSpectrogramAnalyser(options?: SpectrogramAnalyserOptions) {
   let outputGainNode: GainNode | null = null;
   let highPassNode: BiquadFilterNode | null = null;
   let analyserNode: AnalyserNode | null = null;
+  let preAnalyserNode: AnalyserNode | null = null;
+  let insertInput: AudioNode | null = null;
+  let insertOutput: AudioNode | null = null;
 
   /** Connect to a media element and set up the Web Audio graph */
   async function connect(mediaElement: HTMLMediaElement): Promise<void> {
@@ -122,7 +138,24 @@ export function useSpectrogramAnalyser(options?: SpectrogramAnalyserOptions) {
 
       // Connect chain: source → highpass → gain → analyser → outputGain → destination
       sourceNode.connect(highPassNode);
-      highPassNode.connect(gainNode);
+      // Pre tap: the signal as it arrives, before any insert. Not connected onward.
+      if (options?.preAnalyser) {
+        preAnalyserNode = audioContext.createAnalyser();
+        preAnalyserNode.fftSize = fftSize;
+        preAnalyserNode.smoothingTimeConstant = ANALYSER_SMOOTHING;
+        highPassNode.connect(preAnalyserNode);
+        preFrequencyData = new Uint8Array(preAnalyserNode.frequencyBinCount);
+        preAnalyser = preAnalyserNode;
+      }
+      if (options?.insert) {
+        const block = options.insert(audioContext);
+        insertInput = block.input;
+        insertOutput = block.output;
+        highPassNode.connect(insertInput);
+        insertOutput.connect(gainNode);
+      } else {
+        highPassNode.connect(gainNode);
+      }
       gainNode.connect(analyserNode);
       analyserNode.connect(outputGainNode);
       outputGainNode.connect(audioContext.destination);
@@ -149,6 +182,9 @@ export function useSpectrogramAnalyser(options?: SpectrogramAnalyserOptions) {
     try {
       if (outputGainNode) outputGainNode.disconnect();
       if (analyserNode) analyserNode.disconnect();
+      if (preAnalyserNode) preAnalyserNode.disconnect();
+      if (insertOutput) insertOutput.disconnect();
+      if (insertInput) insertInput.disconnect();
       if (gainNode) gainNode.disconnect();
       if (highPassNode) highPassNode.disconnect();
       if (sourceNode) sourceNode.disconnect();
@@ -158,6 +194,10 @@ export function useSpectrogramAnalyser(options?: SpectrogramAnalyserOptions) {
 
     outputGainNode = null;
     analyserNode = null;
+    preAnalyserNode = null;
+    preAnalyser = null;
+    insertInput = null;
+    insertOutput = null;
     gainNode = null;
     highPassNode = null;
     sourceNode = null;
@@ -205,6 +245,12 @@ export function useSpectrogramAnalyser(options?: SpectrogramAnalyserOptions) {
     },
     get frequencyData() {
       return frequencyData;
+    },
+    get preAnalyser() {
+      return preAnalyser;
+    },
+    get preFrequencyData() {
+      return preFrequencyData;
     },
     get isActive() {
       return isActive;
