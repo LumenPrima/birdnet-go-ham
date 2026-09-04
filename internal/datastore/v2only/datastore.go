@@ -1239,6 +1239,7 @@ func (ds *Datastore) GetTopBirdsData(ctx context.Context, selectedDate string, m
 		Count          int     `gorm:"column:count"`
 		MaxConfidence  float64 `gorm:"column:max_confidence"`
 		LatestTime     int64   `gorm:"column:latest_time"`
+		FirstTime      int64   `gorm:"column:first_time"`
 	}
 
 	var results []speciesAggregate
@@ -1255,7 +1256,8 @@ func (ds *Datastore) GetTopBirdsData(ctx context.Context, selectedDate string, m
 			l.scientific_name,
 			COUNT(d.id) as count,
 			MAX(d.confidence) as max_confidence,
-			MAX(d.detected_at) as latest_time
+			MAX(d.detected_at) as latest_time,
+			MIN(d.detected_at) as first_time
 		`).
 		Joins(fmt.Sprintf("JOIN %slabels l ON d.label_id = l.id", prefix)).
 		Joins(fmt.Sprintf("LEFT JOIN %sdetection_reviews dr ON d.id = dr.detection_id", prefix)).
@@ -1276,6 +1278,7 @@ func (ds *Datastore) GetTopBirdsData(ctx context.Context, selectedDate string, m
 	for _, r := range results {
 		// Format the latest time as HH:MM:SS
 		latestTime := time.Unix(r.LatestTime, 0).In(ds.timezone)
+		firstTime := time.Unix(r.FirstTime, 0).In(ds.timezone)
 
 		// Labels may contain legacy concatenated "ScientificName_CommonName" format,
 		// so extract only the scientific name portion.
@@ -1291,6 +1294,7 @@ func (ds *Datastore) GetTopBirdsData(ctx context.Context, selectedDate string, m
 			Confidence:     r.MaxConfidence,
 			Date:           selectedDate,
 			Time:           latestTime.Format(time.TimeOnly),
+			FirstTime:      firstTime.Format(time.TimeOnly),
 		}
 		notes = append(notes, note)
 	}
@@ -2861,6 +2865,7 @@ type speciesFirstSeenInfo struct {
 	ScientificName string
 	FirstDetected  int64
 	LastDetected   int64
+	CountInPeriod  int // detections inside the queried window; only the lifetime-first query fills it
 }
 
 // convertToNewSpeciesData converts species first-seen data to NewSpeciesData with common name resolution.
@@ -2893,7 +2898,7 @@ func (ds *Datastore) convertToNewSpeciesData(_ context.Context, data []speciesFi
 			CommonName:     commonName,
 			FirstSeenDate:  firstSeenDate,
 			LastSeenDate:   lastSeenDate,
-			CountInPeriod:  0,
+			CountInPeriod:  d.CountInPeriod,
 		})
 	}
 	return result
@@ -2919,6 +2924,7 @@ func (ds *Datastore) GetNewSpeciesDetections(ctx context.Context, startDate, end
 			ScientificName: d.ScientificName,
 			FirstDetected:  d.FirstDetected,
 			LastDetected:   d.LastDetected,
+			CountInPeriod:  d.CountInPeriod,
 		}
 	}
 
