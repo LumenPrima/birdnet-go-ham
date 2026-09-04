@@ -1,0 +1,150 @@
+name: ham build
+
+# Fork-only integration build for LumenPrima/birdnet-go-ham. The `ham` branch is
+# upstream main plus the fork's unmerged feature branches; every push to it
+# publishes:
+#   - a container image  ghcr.io/lumenprima/birdnet-go-ham:dev (+ :ham-<date>-<sha>)
+#   - a GitHub prerelease ham-<date>-<sha> carrying the linux/amd64 and
+#     windows/amd64 tarballs, a Windows zip, and checksums.
+# This file lives only on `ham`; feature branches destined for upstream must not
+# carry it.
+
+on:
+  push:
+    branches:
+      - ham
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+concurrency:
+  group: ham-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  version:
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.ver.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - id: ver
+        run: |
+          VERSION="ham-$(date -u +%Y%m%d)-$(git rev-parse --short=7 HEAD)"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Building ${VERSION}"
+
+  binaries:
+    name: binary (${{ matrix.goos }}/${{ matrix.goarch }})
+    needs: version
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - goos: linux
+            goarch: amd64
+          - goos: windows
+            goarch: amd64
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Build BirdNET-Go binary
+        uses: ./.github/actions/build-birdnet-binary
+        with:
+          goos: ${{ matrix.goos }}
+          goarch: ${{ matrix.goarch }}
+          build-version: ${{ needs.version.outputs.version }}
+          tarball-suffix: "-${{ needs.version.outputs.version }}"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  release:
+    needs: [version, binaries]
+    runs-on: ubuntu-24.04
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: artifacts
+          pattern: birdnet-go-*
+          merge-multiple: true
+
+      - name: Package Windows zip and checksums
+        run: |
+          set -euo pipefail
+          cd artifacts
+          # Windows users expect a zip; repack the tarball the shared action produced.
+          mkdir win && tar xzf "birdnet-go-windows-amd64-${VERSION}.tar.gz" -C win
+          (cd win && zip -qr "../birdnet-go-windows-amd64-${VERSION}.zip" .)
+          rm -rf win
+          sha256sum -- *.tar.gz *.zip > checksums.txt
+          ls -la
+          cat checksums.txt
+
+      - name: Write release notes
+        run: |
+          set -euo pipefail
+          git remote add upstream https://github.com/tphakala/birdnet-go.git
+          git fetch -q upstream main
+          {
+            echo "Integration build of the \`ham\` branch at ${GITHUB_SHA}."
+            echo
+            echo "Container image: \`ghcr.io/${GITHUB_REPOSITORY,,}:${VERSION}\` (also \`:dev\`)"
+            echo
+            echo "## On top of upstream main"
+            echo
+            git log --no-merges --format='- %h %s' upstream/main..HEAD | head -100
+            echo
+            echo "## Upstream main at build time"
+            echo
+            echo "- $(git log -1 --format='%h %s' upstream/main)"
+          } > notes.md
+          cat notes.md
+
+      - name: Create prerelease
+        run: |
+          set -euo pipefail
+          gh release create "${VERSION}" \
+            --target "${GITHUB_SHA}" \
+            --prerelease \
+            --title "${VERSION}" \
+            --notes-file notes.md \
+            artifacts/*.tar.gz artifacts/*.zip artifacts/checksums.txt
+
+      - name: Prune older ham prereleases
+        env:
+          KEEP: '5'
+        run: |
+          set -euo pipefail
+          gh release list --limit 100 --json tagName,createdAt \
+            --jq "[.[] | select(.tagName | startswith(\"ham-\"))] | sort_by(.createdAt) | reverse | .[${KEEP}:] | .[].tagName" \
+          | while read -r tag; do
+              echo "Deleting ${tag}"
+              gh release delete "${tag}" --yes --cleanup-tag
+            done
+
+  docker:
+    needs: version
+    uses: ./.github/workflows/docker-build-push.yml
+    with:
+      tag-strategy: "dev"
+      version: ${{ needs.version.outputs.version }}
+      create-latest-tag: false
+      platforms: '["linux/amd64"]'
+      push-to-ghcr: true
+      push-to-dockerhub: false
+      cleanup-old-images: false
+      validate-podman: false
+      keep-images-count: 14
+    secrets: inherit
