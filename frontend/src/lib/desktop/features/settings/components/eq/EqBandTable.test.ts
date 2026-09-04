@@ -63,4 +63,17 @@ describe('EqBandTable', () => {
     await fireEvent.click(add);
     expect(onAdd).toHaveBeenCalledWith('LowShelf');
   });
+
+  it('shows a saved slope of 0 passes as the single pass the station runs', () => {
+    render(EqBandTable, {
+      props: {
+        bands: [{ id: 'hp0', type: 'HighPass', frequency: 100, q: 0.707, passes: 0 }],
+        types: [...types],
+      },
+    });
+    const slope = screen.getByLabelText<HTMLSelectElement>(
+      'settings.audio.audioFilters.console.columns.slope'
+    );
+    expect(slope.value).toBe('1');
+  });
 });

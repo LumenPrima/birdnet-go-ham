@@ -9,6 +9,7 @@
  * rebuilds the cascade.
  */
 
+import { untrack } from 'svelte';
 import { bandsToStages, type BiquadStage, type MirrorBand } from './eqMirror';
 import type { AnalyserInsert } from './useSpectrogramAnalyser.svelte';
 
@@ -59,8 +60,14 @@ export function useEqMirror() {
     param.linearRampToValueAtTime(value, now + PARAM_RAMP_SECONDS);
   }
 
+  // Callers drive setBands/setEnabled from their own effects; reading the mirror's state
+  // here must not subscribe that effect to what it just wrote, or it re-runs forever.
+  function currentStages(): BiquadStage[] {
+    return untrack(() => bandsToStages(bands, enabled));
+  }
+
   function apply(): void {
-    const stages = bandsToStages(bands, enabled);
+    const stages = currentStages();
     if (!audioContext) return;
     if (!sameShape(stages)) {
       rebuild(stages);
@@ -81,7 +88,7 @@ export function useEqMirror() {
     input = ctx.createGain();
     output = ctx.createGain();
     nodes = [];
-    rebuild(bandsToStages(bands, enabled));
+    rebuild(currentStages());
     return { input, output };
   };
 

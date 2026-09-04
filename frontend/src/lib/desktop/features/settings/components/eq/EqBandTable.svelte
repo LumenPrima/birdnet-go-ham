@@ -219,7 +219,7 @@
           <td class="py-1.5 pr-2">
             <select
               class={selectClass}
-              value={slopeOff ? 1 : (band.passes ?? 1)}
+              value={slopeOff ? 1 : Math.max(1, band.passes ?? 1)}
               disabled={disabled || slopeOff}
               aria-label={t('settings.audio.audioFilters.console.columns.slope')}
               aria-describedby={slopeOff ? `eq-slope-note-${band.id}` : undefined}

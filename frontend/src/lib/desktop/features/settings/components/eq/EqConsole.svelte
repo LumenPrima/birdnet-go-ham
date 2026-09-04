@@ -9,13 +9,14 @@
   @component
 -->
 <script lang="ts">
+  import { tick } from 'svelte';
   import { t } from '$lib/i18n';
   import { toastActions } from '$lib/stores/toast';
   import { settingsActions } from '$lib/stores/settings';
   import type { EqualizerFilter, EqualizerFilterType } from '$lib/stores/settings';
   import { loggers } from '$lib/utils/logger';
   import { useEqMirror } from '$lib/utils/useEqMirror.svelte';
-  import type { MirrorBand } from '$lib/utils/eqMirror';
+  import { usesGain, usesPasses, usesWidth, type MirrorBand } from '$lib/utils/eqMirror';
   import EqCurve from './EqCurve.svelte';
   import EqBandTable from './EqBandTable.svelte';
   import EqMonitor from './EqMonitor.svelte';
@@ -43,6 +44,8 @@
 
   const logger = loggers.settings;
   const SPECTRUM_BINS = 200;
+  /** Shared so the mirror effect sees the same reference each run while the station plays. */
+  const NO_BANDS: MirrorBand[] = [];
 
   /** Sensible starting values for a new band of each type. */
   function defaultsFor(type: EqualizerFilterType): Partial<EqualizerFilter> {
@@ -72,6 +75,23 @@
   function toSaved(bands: MirrorBand[]): EqualizerFilter[] {
     return bands.map(({ bypass: _bypass, ...rest }) => rest);
   }
+  /**
+   * What the station actually runs for a band: the store fills in every field with
+   * defaults on save, so only the fields the type uses are compared, and a saved
+   * passes of 0 means the same single pass the console shows.
+   */
+  function fingerprint(filters: FilterLike[]): string {
+    return JSON.stringify(
+      filters.map(f => ({
+        type: f.type,
+        frequency: f.frequency,
+        q: usesWidth(f.type) ? undefined : f.q,
+        width: usesWidth(f.type) ? f.width : undefined,
+        gain: usesGain(f.type) ? (f.gain ?? 0) : undefined,
+        passes: usesPasses(f.type) ? Math.max(1, f.passes ?? 1) : undefined,
+      }))
+    );
+  }
 
   // The proposed set is seeded once from the saved one and then edited locally; Reset re-seeds
   // it on demand, so following the prop reactively is not wanted.
@@ -91,7 +111,7 @@
   const savedBands = $derived(fromSaved(equalizerSettings.filters));
   const dirty = $derived(
     proposedEnabled !== equalizerSettings.enabled ||
-      JSON.stringify(toSaved(proposed)) !== JSON.stringify(equalizerSettings.filters)
+      fingerprint(toSaved(proposed)) !== fingerprint(equalizerSettings.filters)
   );
   const shownBands = $derived(listenTo === 'proposed' ? proposed : savedBands);
   const shownEnabled = $derived(
@@ -100,7 +120,7 @@
 
   // The mirror always plays what the curve shows; on the station stream it is silent.
   $effect(() => {
-    mirror.setBands(monitorMode === 'raw' ? shownBands : []);
+    mirror.setBands(monitorMode === 'raw' ? shownBands : NO_BANDS);
     mirror.setEnabled(monitorMode === 'raw' && shownEnabled);
   });
 
@@ -131,6 +151,10 @@
     try {
       onUpdate({ enabled: proposedEnabled, filters: toSaved(proposed) });
       await settingsActions.saveSettings();
+      // Re-seed from the saved set so ids and defaults match what the station now runs.
+      await tick();
+      proposed = fromSaved(equalizerSettings.filters);
+      proposedEnabled = equalizerSettings.enabled;
       toastActions.success(t('notifications.content.settings.equalizerUpdated'));
     } catch (error) {
       logger.error('Failed to apply equalizer', error);
