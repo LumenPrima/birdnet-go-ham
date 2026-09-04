@@ -279,8 +279,9 @@ func (c *Handler) createNativeHLSStream(sourceID string) (*HLSStreamInfo, error)
 // prepareNativeAudioFeed registers the audio route. There is no FIFO to open and
 // no secure filesystem to hold, so the resources are just the feed queue and the
 // route cleanup.
-func (c *Handler) prepareNativeAudioFeed(sourceID string) (*audioFeedResources, error) {
-	feed, callbackCleanup, err := c.setupAudioCallback(sourceID, nativeHLSSampleRate, nativeHLSFeedQueueBytes)
+func (c *Handler) prepareNativeAudioFeed(streamKey string) (*audioFeedResources, error) {
+	sourceID, raw := splitHLSStreamKey(streamKey)
+	feed, callbackCleanup, err := c.setupAudioCallback(sourceID, raw, nativeHLSSampleRate, nativeHLSFeedQueueBytes)
 	if err != nil {
 		return nil, err
 	}
