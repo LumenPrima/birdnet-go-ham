@@ -338,3 +338,38 @@ describe('settingsCoercion realtime mqtt tls settings', () => {
     });
   });
 });
+
+describe('settingsCoercion realtime audio equalizer', () => {
+  const coerce = (equalizer: Record<string, unknown>) =>
+    (
+      coerceSettings('realtime', { audio: { equalizer } }) as {
+        audio: { equalizer: Record<string, unknown> };
+      }
+    ).audio.equalizer;
+
+  it('keeps the advanced flag and defaults it to false', () => {
+    expect(coerce({ enabled: true, advanced: true, filters: [] }).advanced).toBe(true);
+    expect(coerce({ enabled: true, filters: [] }).advanced).toBe(false);
+  });
+
+  it('keeps shelf and parametric bands instead of folding them into LowPass', () => {
+    const filters = coerce({
+      enabled: true,
+      filters: [
+        { type: 'LowShelf', frequency: 150, gain: 3 },
+        { type: 'HighShelf', frequency: 8000, gain: -2 },
+        { type: 'Peaking', frequency: 2500, q: 2, gain: 6 },
+      ],
+    }).filters as Array<{ type: string; frequency: number; gain: number }>;
+    expect(filters.map(f => f.type)).toEqual(['LowShelf', 'HighShelf', 'Peaking']);
+    expect(filters.map(f => f.gain)).toEqual([3, -2, 6]);
+  });
+
+  it('clamps band gain to the backend limit', () => {
+    const [f] = coerce({
+      enabled: true,
+      filters: [{ type: 'Peaking', frequency: 1000, gain: 40 }],
+    }).filters as Array<{ gain: number }>;
+    expect(f.gain).toBe(30);
+  });
+});

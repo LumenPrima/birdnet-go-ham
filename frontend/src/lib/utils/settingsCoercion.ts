@@ -28,6 +28,12 @@ import type {
 } from '$lib/stores/settings';
 import { AUDIO_GAIN_MIN_DB, AUDIO_GAIN_MAX_DB } from '$lib/stores/settings';
 
+/** Equalizer band gain limit, matching the backend's MaxEQGainDB validation. */
+const EQ_MAX_GAIN_DB = 30;
+/** Corner frequencies used when a shelf band arrives without one. */
+const EQ_LOW_SHELF_DEFAULT_HZ = 200;
+const EQ_HIGH_SHELF_DEFAULT_HZ = 5000;
+
 // Type for partial/unknown settings data
 type UnknownSettings = Record<string, unknown>;
 type PartialBirdNetSettings = Partial<BirdNetSettings> & UnknownSettings;
@@ -305,6 +311,7 @@ export function coerceAudioSettings(settings: PartialAudioSettings): PartialAudi
     const eq = settings.equalizer as unknown as UnknownSettings;
     coerced.equalizer = {
       enabled: coerceBoolean(eq.enabled, false),
+      advanced: coerceBoolean(eq.advanced, false),
       filters: coerceArray(eq.filters, [])
         .map(filter => {
           // Type guard for valid filter objects
@@ -324,6 +331,9 @@ export function coerceAudioSettings(settings: PartialAudioSettings): PartialAudi
             bandstop: 'BandReject',
             bandreject: 'BandReject',
             notch: 'BandReject',
+            lowshelf: 'LowShelf',
+            highshelf: 'HighShelf',
+            peaking: 'Peaking',
           };
           const rawType = coerceString(f.type, 'LowPass').toLowerCase();
           const normalizedType =
@@ -333,8 +343,16 @@ export function coerceAudioSettings(settings: PartialAudioSettings): PartialAudi
           let defaultFrequency = 15000; // Default for LowPass
           if (normalizedType === 'HighPass') {
             defaultFrequency = 100;
-          } else if (normalizedType === 'BandReject' || normalizedType === 'BandPass') {
+          } else if (
+            normalizedType === 'BandReject' ||
+            normalizedType === 'BandPass' ||
+            normalizedType === 'Peaking'
+          ) {
             defaultFrequency = 1000;
+          } else if (normalizedType === 'LowShelf') {
+            defaultFrequency = EQ_LOW_SHELF_DEFAULT_HZ;
+          } else if (normalizedType === 'HighShelf') {
+            defaultFrequency = EQ_HIGH_SHELF_DEFAULT_HZ;
           }
 
           const coercedFilter: EqualizerFilter = {
@@ -346,7 +364,7 @@ export function coerceAudioSettings(settings: PartialAudioSettings): PartialAudi
             frequency: coerceNumber(f.frequency, 20, 20000, defaultFrequency),
             q: coerceNumber(f.q, 0.1, 10, 0.707),
             width: coerceNumber(f.width, 1, 10000, 100), // Bandwidth in Hz
-            gain: coerceNumber(f.gain, -48, 12, 0),
+            gain: coerceNumber(f.gain, -EQ_MAX_GAIN_DB, EQ_MAX_GAIN_DB, 0),
             passes: 1, // Default passes
           };
 
