@@ -610,8 +610,11 @@
       passes?: number;
     }>;
   }) {
-    // Transform filters to ensure all have an id (required by store type)
+    // Transform filters to ensure all have an id (required by store type). The
+    // editor only reports enabled and filters; flags it does not own, such as
+    // advanced, are carried over from the store.
     const transformedSettings = {
+      ...$audioSettings!.equalizer,
       enabled: equalizerSettings.enabled,
       filters: equalizerSettings.filters.map((filter, index) => ({
         ...filter,
