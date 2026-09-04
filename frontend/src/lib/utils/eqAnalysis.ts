@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection -- every index here is a bounded loop counter into a typed array */
 /**
  * Real-time analyzer helpers for the equalizer console: turning an AnalyserNode's byte
  * spectrum into log-spaced dB bins that line up with a 20 Hz to 20 kHz curve, peak hold,

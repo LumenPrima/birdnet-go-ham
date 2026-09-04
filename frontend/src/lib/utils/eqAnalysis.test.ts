@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection -- indices are literal or bounded loop counters into typed arrays */
 import { describe, it, expect } from 'vitest';
 import {
   ANALYSER_MAX_DB,
