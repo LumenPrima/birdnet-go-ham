@@ -38,8 +38,9 @@ type EqualizerFilter struct {
 
 // EqualizerSettings is a struct for audio EQ settings
 type EqualizerSettings struct {
-	Enabled bool              `yaml:"enabled" json:"enabled"` // global flag to enable/disable equalizer filters
-	Filters []EqualizerFilter `yaml:"filters" json:"filters"` // equalizer filter configuration
+	Enabled  bool              `yaml:"enabled" json:"enabled"`   // global flag to enable/disable equalizer filters
+	Advanced bool              `yaml:"advanced" json:"advanced"` // show the console-style editor with every filter type, live monitoring and analyzers (UI scope; global setting only)
+	Filters  []EqualizerFilter `yaml:"filters" json:"filters"`   // equalizer filter configuration
 }
 
 type ExportSettings struct {

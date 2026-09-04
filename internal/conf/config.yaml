@@ -189,13 +189,14 @@ realtime:
       interval: 10        # measurement interval in seconds (min 5 recommended, lower values increase CPU load)
     equalizer:
       enabled: false
+      advanced: false # console editor with every filter type, live monitor and analyzers
       filters:
         - type: HighPass
           frequency: 100
-          passes: 0 
+          passes: 1 # 1 = 12 dB/oct, 2 = 24, 4 = 48
         - type: LowPass
           frequency: 15000
-          passes: 0 
+          passes: 1
     quietHours:
       enabled: false      # true to enable quiet hours (stop capture during specified times)
       mode: fixed         # "fixed" for clock times, "solar" for sunrise/sunset based

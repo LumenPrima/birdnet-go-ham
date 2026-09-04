@@ -298,12 +298,9 @@ export function calculateFilterResponse(
   frequency: number,
   sampleRate: number = DEFAULT_SAMPLE_RATE
 ): number {
-  const passes = filter.passes ?? 0;
-
-  // If no passes (0dB attenuation), return flat response
-  if (passes === 0) {
-    return 0;
-  }
+  // Zero or missing passes means one pass, matching the backend builder; the response is
+  // never flat for a configured filter.
+  const passes = Math.max(1, filter.passes ?? 1);
 
   const coeffs = calculateCoefficients(filter, sampleRate);
   let magnitude = calculateMagnitudeResponse(coeffs, frequency, sampleRate);

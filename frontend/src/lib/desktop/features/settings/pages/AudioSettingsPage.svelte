@@ -127,6 +127,7 @@
         },
         equalizer: {
           enabled: false,
+          advanced: false,
           filters: [],
         },
         export: {
@@ -169,6 +170,7 @@
           sources: audioBase.sources ?? [],
           equalizer: {
             enabled: audioBase.equalizer?.enabled ?? false,
+            advanced: audioBase.equalizer?.advanced ?? false,
             filters: audioBase.equalizer?.filters ?? [], // Always ensures filters is an array
           },
         },
@@ -586,6 +588,14 @@
     });
   }
 
+  // The advanced flag only changes which editor the page shows; it is stored with the
+  // equalizer so it travels with the rest of the audio settings.
+  function handleAdvancedEqualizerToggle(advanced: boolean) {
+    settingsActions.updateSection('realtime', {
+      audio: { ...$audioSettings!, equalizer: { ...$audioSettings!.equalizer, advanced } },
+    });
+  }
+
   // Handle equalizer updates from the AudioEqualizerSettings component
   // Note: Filter type matches component's local interface with optional id
   function handleEqualizerUpdate(equalizerSettings: {
@@ -600,8 +610,11 @@
       passes?: number;
     }>;
   }) {
-    // Transform filters to ensure all have an id (required by store type)
+    // Transform filters to ensure all have an id (required by store type). The
+    // editor only reports enabled and filters; flags it does not own, such as
+    // advanced, are carried over from the store.
     const transformedSettings = {
+      ...$audioSettings!.equalizer,
       enabled: equalizerSettings.enabled,
       filters: equalizerSettings.filters.map((filter, index) => ({
         ...filter,
@@ -899,8 +912,16 @@
       originalData={store.originalData.realtime?.audio?.equalizer}
       currentData={store.formData.realtime?.audio?.equalizer}
     >
+      <Checkbox
+        checked={settings.audio.equalizer.advanced ?? false}
+        label={t('settings.audio.audioFilters.advancedEqualizer')}
+        helpText={t('settings.audio.audioFilters.advancedEqualizerHelp')}
+        disabled={store.isLoading || store.isSaving}
+        onchange={handleAdvancedEqualizerToggle}
+      />
       <AudioEqualizerSettings
         equalizerSettings={settings.audio.equalizer}
+        advanced={settings.audio.equalizer.advanced ?? false}
         disabled={store.isLoading || store.isSaving}
         onUpdate={handleEqualizerUpdate}
       />

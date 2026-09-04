@@ -173,6 +173,11 @@ func (f *Filter) ApplyBatchFloat32(input []float32) {
 
 // Reset clears the filter's internal state variables.
 // Use between independent audio segments to prevent state leakage.
+// Passes returns how many times the biquad is applied per sample (the cascade depth).
+func (f *Filter) Passes() int {
+	return f.passes
+}
+
 func (f *Filter) Reset() {
 	for p := range f.passes {
 		f.in1[p] = 0
@@ -478,6 +483,12 @@ func (fc *FilterChain) AddFilter(f *Filter) error {
 // Length returns the number of filters in the chain.
 func (fc *FilterChain) Length() int {
 	return len(fc.filters)
+}
+
+// Filters returns the chain's filters in processing order. The slice is the chain's own;
+// callers must not modify it.
+func (fc *FilterChain) Filters() []*Filter {
+	return fc.filters
 }
 
 // ApplyBatch applies all filters in the chain to a batch of input signals.

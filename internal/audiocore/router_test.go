@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tphakala/birdnet-go/internal/audiocore/buffer"
+	"github.com/tphakala/birdnet-go/internal/audiocore/convert"
 	"github.com/tphakala/birdnet-go/internal/audiocore/equalizer"
 )
 
@@ -1179,4 +1180,95 @@ func TestRouter_QueueDepth(t *testing.T) {
 		"QueueDepth must be positive when frames are queued in the inbox")
 	assert.LessOrEqual(t, routes[0].QueueDepth, RouteInboxCapacity,
 		"QueueDepth must not exceed inbox capacity")
+}
+
+// TestRouter_AddRawRoute_IgnoresFilterUpdates pins the raw monitor contract: a raw route never
+// carries a chain, and a later UpdateFilterChain on the source leaves it alone while the
+// normal routes of the same source pick the new chain up.
+func TestRouter_AddRawRoute_IgnoresFilterUpdates(t *testing.T) {
+	t.Parallel()
+	router := NewAudioRouter(GetLogger(), nil)
+	t.Cleanup(func() { router.Close() })
+
+	normal := newMockConsumer("normal")
+	raw := newMockConsumer("raw")
+	require.NoError(t, router.AddRoute("src-1", normal, 48000, 0.0, nil))
+	require.NoError(t, router.AddRawRoute("src-1", raw, 48000, 0.0))
+
+	router.UpdateFilterChain("src-1", func(sampleRate int) *equalizer.FilterChain {
+		chain := equalizer.NewFilterChain()
+		hp, err := equalizer.NewHighPass(float64(sampleRate), 100, 0.707, 1)
+		require.NoError(t, err)
+		require.NoError(t, chain.AddFilter(hp))
+		return chain
+	})
+
+	router.mu.RLock()
+	defer router.mu.RUnlock()
+	for _, rt := range router.routes["src-1"] {
+		switch rt.Consumer.ID() {
+		case "normal":
+			assert.NotNil(t, rt.filterChain.Load(), "normal route takes the new chain")
+		case "raw":
+			assert.True(t, rt.bypassEQ)
+			assert.Nil(t, rt.filterChain.Load(), "raw route stays unfiltered")
+		}
+	}
+}
+
+// TestRouter_ChainSwapIsPrimed pins the click-free swap: the first frame processed after a
+// chain swap must match what the same chain would produce had it been running all along,
+// instead of ringing from zeroed biquad state.
+func TestRouter_ChainSwapIsPrimed(t *testing.T) {
+	t.Parallel()
+	router := NewAudioRouter(GetLogger(), nil)
+	t.Cleanup(func() { router.Close() })
+	consumer := newMockConsumer("c1")
+	require.NoError(t, router.AddRoute("src-1", consumer, 48000, 0.0, nil))
+	router.mu.RLock()
+	route := router.routes["src-1"][0]
+	router.mu.RUnlock()
+
+	// A steady low tone that a 1 kHz high pass removes almost entirely.
+	const n = 4800
+	frame := AudioFrame{SampleRate: 48000, BitDepth: bitDepthPCM16, Channels: 1, Data: make([]byte, n*2)}
+	for i := range n {
+		v := int16(12000 * math.Sin(2*math.Pi*50*float64(i)/48000))
+		frame.Data[2*i] = byte(v)
+		frame.Data[2*i+1] = byte(v >> 8)
+	}
+	newChain := func() *equalizer.FilterChain {
+		chain := equalizer.NewFilterChain()
+		hp, err := equalizer.NewHighPass(48000, 1000, 0.707, 2)
+		require.NoError(t, err)
+		require.NoError(t, chain.AddFilter(hp))
+		return chain
+	}
+
+	// Reference: what a chain produces once it has seen the signal before.
+	ref := newChain()
+	refBuf := make([]float64, n)
+	convert.BytesToFloat64PCM16Into(refBuf, frame.Data)
+	ref.ApplyBatch(refBuf)
+	convert.BytesToFloat64PCM16Into(refBuf, frame.Data)
+	ref.ApplyBatch(refBuf)
+
+	// Swap a fresh chain in and process the frame through the router path.
+	swapped := newChain()
+	route.filterChain.Store(swapped)
+	res, err := router.applyProcessing(frame, route, swapped)
+	require.NoError(t, err)
+	defer res.release()
+	got := make([]float64, n)
+	convert.BytesToFloat64PCM16Into(got, res.Frame.Data[:n*2])
+
+	// Compare the opening of the frame, where an unprimed chain rings hardest.
+	var maxDiff float64
+	for i := range 480 {
+		if d := math.Abs(got[i] - refBuf[i]); d > maxDiff {
+			maxDiff = d
+		}
+	}
+	assert.Less(t, maxDiff, 0.002, "primed swap must match a settled chain within PCM16 rounding")
+	assert.Same(t, swapped, route.primedChain)
 }

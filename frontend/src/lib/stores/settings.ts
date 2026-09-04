@@ -299,11 +299,14 @@ export interface AudioQuality {
 
 export interface EqualizerSettings {
   enabled: boolean;
+  /** Console-style editor with every filter type, live monitor and analyzers (global setting only) */
+  advanced?: boolean;
   filters: EqualizerFilter[];
 }
 
 /** Supported equalizer filter types (must match backend eqfilter_config.go) */
-export type EqualizerFilterType = 'HighPass' | 'LowPass' | 'BandReject';
+export type EqualizerFilterType =
+  'HighPass' | 'LowPass' | 'BandReject' | 'BandPass' | 'LowShelf' | 'HighShelf' | 'Peaking';
 
 export interface EqualizerFilter {
   id: string;

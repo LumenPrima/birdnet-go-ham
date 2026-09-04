@@ -92,6 +92,15 @@ type Route struct {
 	// Nil means no EQ filtering is applied.
 	filterChain atomic.Pointer[equalizer.FilterChain]
 
+	// bypassEQ marks a route that must never carry a filter chain: a raw monitor
+	// that lets a listener audition an equalizer in the browser without hearing the
+	// station's own on top of it. UpdateFilterChain leaves such routes alone.
+	bypassEQ bool
+
+	// primedChain is the chain the drainer last ran a warm-up pass through. Owned
+	// by the drainer goroutine; see applyProcessing.
+	primedChain *equalizer.FilterChain
+
 	// inbox is the bounded channel between Dispatch and the drainer goroutine.
 	inbox chan AudioFrame
 
@@ -236,6 +245,17 @@ func NewAudioRouter(log logger.Logger, bufMgr *buffer.Manager) *AudioRouter {
 // different sources will not cause an error but may produce confusing log
 // output and make RemoveRoute ambiguous.
 func (r *AudioRouter) AddRoute(sourceID string, consumer AudioConsumer, sourceSampleRate int, gainDB float64, filterChain *equalizer.FilterChain) error {
+	return r.addRoute(sourceID, consumer, sourceSampleRate, gainDB, filterChain, false)
+}
+
+// AddRawRoute registers a consumer that receives the source's audio with gain but
+// without any equalizer, now or after a later UpdateFilterChain. It exists for the
+// browser-side EQ monitor, which applies the listener's proposed filters itself.
+func (r *AudioRouter) AddRawRoute(sourceID string, consumer AudioConsumer, sourceSampleRate int, gainDB float64) error {
+	return r.addRoute(sourceID, consumer, sourceSampleRate, gainDB, nil, true)
+}
+
+func (r *AudioRouter) addRoute(sourceID string, consumer AudioConsumer, sourceSampleRate int, gainDB float64, filterChain *equalizer.FilterChain, bypassEQ bool) error {
 	// Reject routes after the router has been closed.
 	if r.ctx.Err() != nil {
 		return fmt.Errorf("router is closed: %w", r.ctx.Err())
@@ -265,12 +285,15 @@ func (r *AudioRouter) AddRoute(sourceID string, consumer AudioConsumer, sourceSa
 		Consumer:         consumer,
 		sourceSampleRate: sourceSampleRate,
 		gainLinear:       gainLinear,
+		bypassEQ:         bypassEQ,
 		inbox:            make(chan AudioFrame, RouteInboxCapacity),
 		done:             make(chan struct{}),
 		stopped:          make(chan struct{}),
 	}
 
-	route.filterChain.Store(filterChain)
+	if !bypassEQ {
+		route.filterChain.Store(filterChain)
+	}
 
 	// Create a resampler when the source and consumer rates differ.
 	if sourceSampleRate != consumer.SampleRate() {
@@ -363,6 +386,9 @@ func (r *AudioRouter) UpdateFilterChain(sourceID string, build FilterChainBuilde
 
 	routes := r.routes[sourceID]
 	for _, rt := range routes {
+		if rt.bypassEQ {
+			continue
+		}
 		chain := build(rt.Consumer.SampleRate())
 		rt.filterChain.Store(chain)
 		filterCount := 0
@@ -1045,6 +1071,15 @@ func (r *AudioRouter) applyProcessing(frame AudioFrame, route *Route, chain *equ
 
 	// EQ first - filters operate on the original signal shape.
 	if chain != nil {
+		// A freshly swapped chain starts with zeroed biquad state, so its first
+		// output rings against the silence it assumes came before. Run the new chain
+		// once over this frame and discard the result: its state then holds the
+		// signal's recent history and the real pass below starts settled. One extra
+		// frame of work per swap, nothing on the steady state.
+		if chain != route.primedChain {
+			r.primeChain(chain, floatBuf, route)
+			route.primedChain = chain
+		}
 		chain.ApplyBatch(floatBuf)
 	}
 
@@ -1153,4 +1188,19 @@ func sourceType(sourceID string) string {
 		return sourceID[:idx]
 	}
 	return sourceID
+}
+
+// primeChain runs chain over a scratch copy of samples so its biquad state reflects the
+// signal before the first audible pass. The copy is pooled like the processing buffers.
+func (r *AudioRouter) primeChain(chain *equalizer.FilterChain, samples []float64, route *Route) {
+	pool := r.cachedFloat64Pool(&route.float64Pool, &route.float64PoolLen, len(samples))
+	var scratch []float64
+	if pool != nil {
+		scratch = pool.Get()
+		defer pool.Put(scratch)
+	} else {
+		scratch = make([]float64, len(samples))
+	}
+	copy(scratch, samples)
+	chain.ApplyBatch(scratch)
 }

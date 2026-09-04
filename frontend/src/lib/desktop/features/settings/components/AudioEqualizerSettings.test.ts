@@ -27,6 +27,7 @@ vi.mock('$lib/stores/appState.svelte', () => ({
     },
   },
   getCsrfToken: vi.fn().mockReturnValue('mock-csrf-token'),
+  hasLiveAudioAccess: () => true,
   isSentryEnabled: () => false,
   refreshCsrfToken: vi.fn().mockResolvedValue(false),
   initApp: vi.fn().mockResolvedValue(true),
@@ -175,5 +176,94 @@ describe('AudioEqualizerSettings', () => {
     // Add Filter button should be disabled when component is disabled
     const addButton = screen.getByText('settings.audio.audioFilters.addFilter');
     expect(addButton).toBeDisabled();
+  });
+});
+
+describe('AudioEqualizerSettings advanced gating', () => {
+  const twoTypeConfig = {
+    LowPass: {
+      Simple: true,
+      Parameters: [
+        {
+          Name: 'Frequency',
+          Label: 'Cutoff Frequency',
+          Type: 'number',
+          Unit: 'Hz',
+          Min: 20,
+          Max: 20000,
+          Default: 15000,
+        },
+      ],
+    },
+    Peaking: {
+      Parameters: [
+        {
+          Name: 'Frequency',
+          Label: 'Center Frequency',
+          Type: 'number',
+          Unit: 'Hz',
+          Min: 20,
+          Max: 20000,
+          Default: 1000,
+        },
+        { Name: 'Gain', Label: 'Gain', Type: 'number', Unit: 'dB', Min: -30, Max: 30, Default: 0 },
+      ],
+    },
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    global.fetch = vi.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve(twoTypeConfig),
+      } as unknown as Response)
+    ) as typeof global.fetch;
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
+
+  async function offeredTypes(advanced: boolean): Promise<string[]> {
+    render(AudioEqualizerSettings, {
+      props: {
+        equalizerSettings: { enabled: true, filters: [] },
+        disabled: false,
+        advanced,
+        onUpdate: vi.fn(),
+      },
+    });
+    await waitFor(() => {
+      expect(screen.getByText('settings.audio.audioFilters.newFilterType')).toBeInTheDocument();
+    });
+    const trigger = screen.getByRole('button', { expanded: false });
+    trigger.click();
+    await waitFor(() => {
+      expect(screen.getAllByRole('option').length).toBeGreaterThan(0);
+    });
+    return screen.getAllByRole('option').map(o => o.textContent.trim());
+  }
+
+  it('offers only the basic filter types when advanced is off', async () => {
+    const types = await offeredTypes(false);
+    expect(types).toContain('LowPass');
+    expect(types).not.toContain('Peaking');
+  });
+
+  it('shows the console editor when advanced is on', async () => {
+    render(AudioEqualizerSettings, {
+      props: {
+        equalizerSettings: { enabled: true, filters: [] },
+        disabled: false,
+        advanced: true,
+        onUpdate: vi.fn(),
+      },
+    });
+    await waitFor(() => {
+      expect(screen.getByText('settings.audio.audioFilters.console.apply')).toBeInTheDocument();
+    });
+    expect(screen.queryByText('settings.audio.audioFilters.newFilterType')).not.toBeInTheDocument();
   });
 });

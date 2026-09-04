@@ -157,18 +157,19 @@ func setDefaultConfig() {
 
 	// Audio equalizer configuration
 	viper.SetDefault("realtime.audio.equalizer.enabled", false)
+	viper.SetDefault("realtime.audio.equalizer.advanced", false)
 	viper.SetDefault("realtime.audio.equalizer.filters", []map[string]any{
 		{
 			"type":      "HighPass",
 			"frequency": 100,
 			"q":         0.7,
-			"passes":    0,
+			"passes":    1,
 		},
 		{
 			"type":      "LowPass",
 			"frequency": 15000,
 			"q":         0.7,
-			"passes":    0,
+			"passes":    1,
 		},
 	})
 
