@@ -467,6 +467,9 @@ func (c *Handler) buildHLSStreamResponse(ctx echo.Context, sourceID string, stre
 	// Get client count
 	clientCount := getStreamClientCount(sourceID)
 
+	// sourceID is the stream key here; the client sees the plain source and the raw flag.
+	plainSourceID, raw := splitHLSStreamKey(sourceID)
+
 	// Generate or retrieve stream token for secure URL access
 	token, err := getOrCreateStreamToken(sourceID)
 	if err != nil {
@@ -502,11 +505,12 @@ func (c *Handler) buildHLSStreamResponse(ctx echo.Context, sourceID string, stre
 
 	return ctx.JSON(http.StatusOK, HLSStreamStatus{
 		Status:        status,
-		Source:        url.PathEscape(sourceID),
+		Source:        url.PathEscape(plainSourceID),
 		StreamToken:   token,
 		PlaylistURL:   playlistURL,
 		ActiveClients: clientCount,
 		PlaylistReady: isReady,
+		Raw:           raw,
 		StreamEpoch:   epochStr,
 	})
 }
@@ -602,7 +606,8 @@ func (c *Handler) GetHLSStatus(ctx echo.Context) error {
 
 	streams := make([]HLSStreamStatus, 0, len(streamsCopy))
 	for sourceID, stream := range streamsCopy {
-		encodedSourceID := url.PathEscape(sourceID)
+		plainSourceID, raw := splitHLSStreamKey(sourceID)
+		encodedSourceID := url.PathEscape(plainSourceID)
 
 		// Use token-based playlist URL if token exists
 		var playlistURL string
@@ -623,6 +628,7 @@ func (c *Handler) GetHLSStatus(ctx echo.Context) error {
 			PlaylistURL:   playlistURL,
 			ActiveClients: getStreamClientCount(sourceID),
 			PlaylistReady: playlistReady,
+			Raw:           raw,
 		})
 	}
 
