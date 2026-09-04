@@ -155,7 +155,7 @@
       await tick();
       proposed = fromSaved(equalizerSettings.filters);
       proposedEnabled = equalizerSettings.enabled;
-      toastActions.success(t('notifications.content.settings.equalizerUpdated'));
+      // saveSettings and the station's own equalizer notice already toast on success.
     } catch (error) {
       logger.error('Failed to apply equalizer', error);
       toastActions.error(t('notifications.content.settings.equalizerUpdateFailed'));
