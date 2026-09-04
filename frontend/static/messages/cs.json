@@ -3664,7 +3664,9 @@
           "flatResponse": "Plochá odezva (žádné filtry nejsou použity)",
           "frequency": "Frekvence (Hz)",
           "gain": "Zesílení (dB)"
-        }
+        },
+        "advancedEqualizer": "Pokročilý ekvalizér",
+        "advancedEqualizerHelp": "Editor ve stylu mixážního pultu se všemi typy filtrů (shelf, parametrické, pásmová propust), živým monitoringem s analyzátorem v reálném čase a změnami, které uslyšíte před jejich použitím."
       },
       "soundLevelMonitoring": {
         "title": "Sledování úrovně zvuku",

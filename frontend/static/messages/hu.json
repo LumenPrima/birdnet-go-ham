@@ -3664,7 +3664,9 @@
           "flatResponse": "Lapos válasz (nincs szűrő alkalmazva)",
           "frequency": "Frekvencia (Hz)",
           "gain": "Erősítés (dB)"
-        }
+        },
+        "advancedEqualizer": "Speciális hangszínszabályzó",
+        "advancedEqualizerHelp": "Keverőpult-stílusú szerkesztő minden szűrőtípussal (shelf, parametrikus, sáváteresztő), élő lehallgatással valós idejű analizátorral, és olyan módosításokkal, amelyeket alkalmazás előtt hallhat."
       },
       "soundLevelMonitoring": {
         "title": "Hangszint monitorozás",

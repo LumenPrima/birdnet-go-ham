@@ -3664,7 +3664,9 @@
           "flatResponse": "Risposta Piatta (Nessun Filtro Applicato)",
           "frequency": "Frequenza (Hz)",
           "gain": "Guadagno (dB)"
-        }
+        },
+        "advancedEqualizer": "Equalizzatore avanzato",
+        "advancedEqualizerHelp": "Editor in stile mixer con tutti i tipi di filtro (shelf, parametrico, passa banda), monitoraggio dal vivo con analizzatore in tempo reale e modifiche udibili prima di applicarle."
       },
       "soundLevelMonitoring": {
         "title": "Monitoraggio Livello Sonoro",

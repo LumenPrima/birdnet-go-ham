@@ -48,10 +48,20 @@ const (
 	MaxTruePeak      = 0.0   // Maximum true peak in dBTP
 )
 
-// Equalizer filter validation limits
+// Equalizer filter validation limits. A filter must sit below the Nyquist frequency of the
+// source it is applied to (validateEQFilters checks the source's sample rate), so
+// MaxEQFrequency is the ceiling for the default 48 kHz path; a 256 kHz bat source may go higher.
 const (
-	MaxEQFrequency = 24000.0 // Maximum EQ frequency in Hz (Nyquist for 48 kHz)
-	MaxEQQ         = 100.0   // Maximum Q factor for EQ filters
+	MaxEQFrequency   = 24000.0 // Maximum EQ frequency in Hz on the default 48 kHz path (its Nyquist)
+	MinEQFrequency   = 20.0    // Lowest frequency the UI offers
+	MaxEQUIFrequency = 20000.0 // Highest frequency the UI offers
+	MaxEQQ           = 100.0   // Maximum Q factor for EQ filters
+	MinEQQ           = 0.1     // Lowest Q the UI offers
+	MaxEQUIQ         = 10.0    // Highest Q the UI offers
+	MinEQWidth       = 1.0     // Narrowest bandwidth in Hz
+	MaxEQWidth       = 10000.0 // Widest bandwidth in Hz
+	MaxEQGainDB      = 30.0    // Largest boost or cut in dB for shelf and peaking filters
+	MaxEQPasses      = 4       // Most cascaded passes (48 dB/oct); every pass costs a full biquad per sample on every route
 )
 
 // Stream validation constants
@@ -172,7 +182,7 @@ func (s *StreamConfig) Validate() error {
 	// disabled equalizer never reach the audio path (BuildFilterChain returns nil
 	// for it), so an unfinished one is not a reason to reject the whole config.
 	if s.Equalizer != nil && s.Equalizer.Enabled {
-		if err := validateEQFilters(s.Equalizer.Filters, fmt.Sprintf("stream '%s'", s.Name)); err != nil {
+		if err := validateEQFilters(s.Equalizer.Filters, fmt.Sprintf("stream '%s'", s.Name), SampleRate); err != nil {
 			return err
 		}
 	}
@@ -373,7 +383,7 @@ func (a *AudioSourceConfig) Validate() error {
 	// Validate per-source EQ when it is switched on, matching the global
 	// equalizer: a disabled filter set is never built into the audio path.
 	if a.Equalizer != nil && a.Equalizer.Enabled {
-		if err := validateEQFilters(a.Equalizer.Filters, fmt.Sprintf("audio source '%s'", a.Name)); err != nil {
+		if err := validateEQFilters(a.Equalizer.Filters, fmt.Sprintf("audio source '%s'", a.Name), a.SampleRate); err != nil {
 			return err
 		}
 	}
@@ -589,7 +599,7 @@ func validateAudioSettings(settings *AudioSettings) error {
 
 	// Validate global EQ filters
 	if settings.Equalizer.Enabled && len(settings.Equalizer.Filters) > 0 {
-		if err := validateEQFilters(settings.Equalizer.Filters, "global equalizer"); err != nil {
+		if err := validateEQFilters(settings.Equalizer.Filters, "global equalizer", SampleRate); err != nil {
 			return errors.New(err).
 				Category(errors.CategoryValidation).
 				Context("validation_type", "audio-global-eq").
@@ -779,18 +789,27 @@ func validateExportPath(path string) error {
 
 // validateEQFilters validates a slice of equalizer filters. The context string
 // is used for error messages (e.g. "global equalizer" or "audio source 'Mic'").
-func validateEQFilters(filters []EqualizerFilter, context string) error {
+// sampleRate is the rate of the audio the filters run on (0 means the default
+// analysis rate); a filter at or above its Nyquist frequency would alias.
+func validateEQFilters(filters []EqualizerFilter, context string, sampleRate int) error {
+	if sampleRate <= 0 {
+		sampleRate = SampleRate
+	}
+	nyquist := float64(sampleRate) / 2
 	for i, f := range filters {
-		// NaN comparisons always return false, so NaN would bypass range checks.
-		// YAML supports .nan literals; reject them explicitly.
-		if math.IsNaN(f.Frequency) || math.IsNaN(f.Q) {
-			return fmt.Errorf("%s: filter %d has NaN value for frequency or Q (must be a valid number)", context, i+1)
+		if !IsKnownEQFilterType(f.Type) {
+			return fmt.Errorf("%s: filter %d has unknown type %q", context, i+1, f.Type)
+		}
+		// NaN and Inf compare false against every bound, so they would bypass the
+		// range checks (YAML accepts .nan and .inf literals). Reject them explicitly.
+		if !isFiniteFloat(f.Frequency) || !isFiniteFloat(f.Q) || !isFiniteFloat(f.Gain) || !isFiniteFloat(f.Width) {
+			return fmt.Errorf("%s: filter %d has a NaN or infinite value (frequency, Q, gain and width must be finite numbers)", context, i+1)
 		}
 		if f.Frequency <= 0 {
 			return fmt.Errorf("%s: filter %d has invalid frequency %.1f (must be positive)", context, i+1, f.Frequency)
 		}
-		if f.Frequency > MaxEQFrequency {
-			return fmt.Errorf("%s: filter %d frequency %.1f exceeds maximum %.0f Hz", context, i+1, f.Frequency, MaxEQFrequency)
+		if f.Frequency >= nyquist {
+			return fmt.Errorf("%s: filter %d frequency %.1f Hz is at or above the Nyquist frequency %.0f Hz of a %d Hz source", context, i+1, f.Frequency, nyquist, sampleRate)
 		}
 		if f.Q <= 0 {
 			return fmt.Errorf("%s: filter %d has invalid Q factor %.4f (must be positive)", context, i+1, f.Q)
@@ -798,6 +817,25 @@ func validateEQFilters(filters []EqualizerFilter, context string) error {
 		if f.Q > MaxEQQ {
 			return fmt.Errorf("%s: filter %d Q factor %.1f exceeds maximum %.0f", context, i+1, f.Q, MaxEQQ)
 		}
+		if eqFilterUsesWidth(f.Type) {
+			if f.Width <= 0 {
+				return fmt.Errorf("%s: filter %d (%s) has invalid bandwidth %.1f Hz (must be positive)", context, i+1, f.Type, f.Width)
+			}
+			if f.Width >= 2*f.Frequency {
+				return fmt.Errorf("%s: filter %d (%s) bandwidth %.1f Hz is too wide for its center frequency %.1f Hz (must be below %.1f Hz)", context, i+1, f.Type, f.Width, f.Frequency, 2*f.Frequency)
+			}
+		}
+		if eqFilterUsesGain(f.Type) && math.Abs(f.Gain) > MaxEQGainDB {
+			return fmt.Errorf("%s: filter %d (%s) gain %.1f dB exceeds the %.0f dB limit", context, i+1, f.Type, f.Gain, MaxEQGainDB)
+		}
+		if f.Passes < 0 || f.Passes > MaxEQPasses {
+			return fmt.Errorf("%s: filter %d has invalid passes %d (0 or 1 to %d; each pass adds 12 dB/oct)", context, i+1, f.Passes, MaxEQPasses)
+		}
 	}
 	return nil
+}
+
+// isFiniteFloat reports whether v is neither NaN nor infinite.
+func isFiniteFloat(v float64) bool {
+	return !math.IsNaN(v) && !math.IsInf(v, 0)
 }

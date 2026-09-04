@@ -3664,7 +3664,9 @@
           "flatResponse": "Plant svar (inga filter tillämpade)",
           "frequency": "Frekvens (Hz)",
           "gain": "Förstärkning (dB)"
-        }
+        },
+        "advancedEqualizer": "Avancerad equalizer",
+        "advancedEqualizerHelp": "Mixerbordsliknande redigerare med alla filtertyper (shelf, parametrisk, bandpass), livemedhörning med realtidsanalysator och ändringar du kan höra innan du tillämpar dem."
       },
       "soundLevelMonitoring": {
         "title": "Övervakning av ljudnivå",

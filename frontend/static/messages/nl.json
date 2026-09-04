@@ -3664,7 +3664,9 @@
           "flatResponse": "Vlakke respons (Geen filters toegepast)",
           "frequency": "Frequentie (Hz)",
           "gain": "Versterking (dB)"
-        }
+        },
+        "advancedEqualizer": "Geavanceerde equalizer",
+        "advancedEqualizerHelp": "Mengpaneel-stijl editor met alle filtertypen (shelf, parametrisch, banddoorlaat), live meeluisteren met realtime-analyzer en wijzigingen die u hoort voordat u ze toepast."
       },
       "soundLevelMonitoring": {
         "title": "Geluidsniveau Monitoring",

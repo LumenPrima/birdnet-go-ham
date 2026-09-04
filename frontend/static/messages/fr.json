@@ -3664,7 +3664,9 @@
           "flatResponse": "Réponse plate (Aucun filtre appliqué)",
           "frequency": "Fréquence (Hz)",
           "gain": "Gain (dB)"
-        }
+        },
+        "advancedEqualizer": "Égaliseur avancé",
+        "advancedEqualizerHelp": "Éditeur façon console de mixage avec tous les types de filtres (shelf, paramétrique, passe-bande), écoute en direct avec analyseur temps réel et modifications audibles avant application."
       },
       "soundLevelMonitoring": {
         "title": "Surveillance du niveau sonore",

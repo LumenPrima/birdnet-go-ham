@@ -3664,7 +3664,9 @@
           "flatResponse": "Flat Response (No Filters Applied)",
           "frequency": "Frequency (Hz)",
           "gain": "Gain (dB)"
-        }
+        },
+        "advancedEqualizer": "Advanced equalizer",
+        "advancedEqualizerHelp": "Console-style editor with every filter type (shelves, parametric, band-pass), live monitoring with a real-time analyzer, and changes you can hear before applying them."
       },
       "soundLevelMonitoring": {
         "title": "Sound Level Monitoring",

@@ -3664,7 +3664,9 @@
           "flatResponse": "Tasainen vaste (Ei suodattimia käytössä)",
           "frequency": "Taajuus (Hz)",
           "gain": "Vahvistus (dB)"
-        }
+        },
+        "advancedEqualizer": "Edistynyt taajuuskorjain",
+        "advancedEqualizerHelp": "Mikserityylinen editori kaikilla suodintyypeillä (hylly, parametrinen, kaistanpäästö), suora monitorointi reaaliaikaisella analysaattorilla ja muutokset, jotka kuulet ennen käyttöönottoa."
       },
       "soundLevelMonitoring": {
         "title": "Äänitason seuranta",

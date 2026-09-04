@@ -172,94 +172,142 @@ func TestValidateAudioSettings_ExportPathTraversal(t *testing.T) {
 func TestValidateEQFilters(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
-		name    string
-		filters []EqualizerFilter
-		wantErr bool
-		errMsg  string
+		name       string
+		filters    []EqualizerFilter
+		sampleRate int
+		wantErr    bool
+		errMsg     string
 	}{
 		{
-			name:    "valid filters",
-			filters: []EqualizerFilter{{Frequency: 1000, Q: 1.0, Type: "Peaking"}},
-			wantErr: false,
+			name:    "valid peaking filter",
+			filters: []EqualizerFilter{{Type: "Peaking", Frequency: 1000, Q: 1.0, Width: 200, Gain: -6}},
+		},
+		{
+			name:    "valid high pass with slope",
+			filters: []EqualizerFilter{{Type: "HighPass", Frequency: 120, Q: 0.707, Passes: 2}},
 		},
 		{
 			name:    "empty filters",
 			filters: []EqualizerFilter{},
-			wantErr: false,
+		},
+		{
+			name:    "unknown type rejected",
+			filters: []EqualizerFilter{{Type: "Comb", Frequency: 1000, Q: 1.0}},
+			wantErr: true,
+			errMsg:  "unknown type",
+		},
+		{
+			name:    "all pass accepted although not offered by the UI",
+			filters: []EqualizerFilter{{Type: "AllPass", Frequency: 1000, Q: 1.0}},
 		},
 		{
 			name:    "zero frequency rejected",
-			filters: []EqualizerFilter{{Frequency: 0, Q: 1.0}},
+			filters: []EqualizerFilter{{Type: "HighPass", Frequency: 0, Q: 1.0}},
 			wantErr: true,
 			errMsg:  "invalid frequency",
 		},
 		{
 			name:    "negative frequency rejected",
-			filters: []EqualizerFilter{{Frequency: -100, Q: 1.0}},
+			filters: []EqualizerFilter{{Type: "HighPass", Frequency: -100, Q: 1.0}},
 			wantErr: true,
 			errMsg:  "invalid frequency",
 		},
 		{
-			name:    "frequency exceeds max rejected",
-			filters: []EqualizerFilter{{Frequency: MaxEQFrequency + 1, Q: 1.0}},
+			name:    "frequency at the default Nyquist rejected",
+			filters: []EqualizerFilter{{Type: "LowPass", Frequency: MaxEQFrequency, Q: 1.0}},
 			wantErr: true,
-			errMsg:  "exceeds maximum",
+			errMsg:  "Nyquist",
 		},
 		{
-			name:    "boundary: max frequency accepted",
-			filters: []EqualizerFilter{{Frequency: MaxEQFrequency, Q: 1.0}},
-			wantErr: false,
+			name:    "frequency just below the default Nyquist accepted",
+			filters: []EqualizerFilter{{Type: "LowPass", Frequency: MaxEQFrequency - 1, Q: 1.0}},
+		},
+		{
+			name:       "bat source accepts a filter above 24 kHz",
+			filters:    []EqualizerFilter{{Type: "HighPass", Frequency: 40000, Q: 0.707}},
+			sampleRate: 256000,
+		},
+		{
+			name:       "low-rate source rejects a filter above its Nyquist",
+			filters:    []EqualizerFilter{{Type: "LowPass", Frequency: 15000, Q: 0.707}},
+			sampleRate: 16000,
+			wantErr:    true,
+			errMsg:     "Nyquist",
 		},
 		{
 			name:    "zero Q rejected",
-			filters: []EqualizerFilter{{Frequency: 1000, Q: 0}},
+			filters: []EqualizerFilter{{Type: "HighPass", Frequency: 1000, Q: 0}},
 			wantErr: true,
-			errMsg:  "invalid Q factor",
-		},
-		{
-			name:    "negative Q rejected",
-			filters: []EqualizerFilter{{Frequency: 1000, Q: -0.5}},
-			wantErr: true,
-			errMsg:  "invalid Q factor",
+			errMsg:  "invalid Q",
 		},
 		{
 			name:    "Q exceeds max rejected",
-			filters: []EqualizerFilter{{Frequency: 1000, Q: MaxEQQ + 1}},
+			filters: []EqualizerFilter{{Type: "HighPass", Frequency: 1000, Q: MaxEQQ + 1}},
 			wantErr: true,
 			errMsg:  "exceeds maximum",
 		},
 		{
-			name:    "boundary: max Q accepted",
-			filters: []EqualizerFilter{{Frequency: 1000, Q: MaxEQQ}},
-			wantErr: false,
-		},
-		{
-			name: "second filter invalid",
-			filters: []EqualizerFilter{
-				{Frequency: 1000, Q: 1.0},
-				{Frequency: -500, Q: 2.0},
-			},
-			wantErr: true,
-			errMsg:  "filter 2",
-		},
-		{
 			name:    "NaN frequency rejected",
-			filters: []EqualizerFilter{{Frequency: math.NaN(), Q: 1.0}},
+			filters: []EqualizerFilter{{Type: "HighPass", Frequency: math.NaN(), Q: 1.0}},
 			wantErr: true,
 			errMsg:  "NaN",
 		},
 		{
 			name:    "NaN Q rejected",
-			filters: []EqualizerFilter{{Frequency: 1000, Q: math.NaN()}},
+			filters: []EqualizerFilter{{Type: "HighPass", Frequency: 1000, Q: math.NaN()}},
 			wantErr: true,
 			errMsg:  "NaN",
+		},
+		{
+			name:    "infinite gain rejected",
+			filters: []EqualizerFilter{{Type: "Peaking", Frequency: 1000, Q: 1.0, Width: 100, Gain: math.Inf(1)}},
+			wantErr: true,
+			errMsg:  "NaN or infinite",
+		},
+		{
+			name:    "gain beyond the limit rejected",
+			filters: []EqualizerFilter{{Type: "LowShelf", Frequency: 200, Q: 0.707, Gain: MaxEQGainDB + 1}},
+			wantErr: true,
+			errMsg:  "gain",
+		},
+		{
+			name:    "gain is ignored on a type without gain",
+			filters: []EqualizerFilter{{Type: "HighPass", Frequency: 200, Q: 0.707, Gain: 99}},
+		},
+		{
+			name:    "band filter without width rejected",
+			filters: []EqualizerFilter{{Type: "BandReject", Frequency: 60, Q: 1.0}},
+			wantErr: true,
+			errMsg:  "bandwidth",
+		},
+		{
+			name:    "band filter wider than twice its center rejected",
+			filters: []EqualizerFilter{{Type: "BandPass", Frequency: 500, Q: 1.0, Width: 1000}},
+			wantErr: true,
+			errMsg:  "too wide",
+		},
+		{
+			name:    "passes above the ceiling rejected",
+			filters: []EqualizerFilter{{Type: "HighPass", Frequency: 100, Q: 0.707, Passes: MaxEQPasses + 1}},
+			wantErr: true,
+			errMsg:  "passes",
+		},
+		{
+			name:    "negative passes rejected",
+			filters: []EqualizerFilter{{Type: "HighPass", Frequency: 100, Q: 0.707, Passes: -1}},
+			wantErr: true,
+			errMsg:  "passes",
+		},
+		{
+			name:    "zero passes accepted as one",
+			filters: []EqualizerFilter{{Type: "HighPass", Frequency: 100, Q: 0.707, Passes: 0}},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			err := validateEQFilters(tt.filters, "test")
+			err := validateEQFilters(tt.filters, "test", tt.sampleRate)
 
 			if tt.wantErr {
 				require.Error(t, err)

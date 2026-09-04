@@ -292,3 +292,19 @@ func TestResolveAndBuildFilterChain_RespectsSampleRate(t *testing.T) {
 	assert.Equal(t, 1, chain48k.Length())
 	assert.Equal(t, 1, chain16k.Length())
 }
+
+// TestBuildFilterChain_PassesClamped pins the pass ceiling: a hand-edited config cannot make one
+// filter cost more than MaxEQPasses biquads per sample on every route.
+func TestBuildFilterChain_PassesClamped(t *testing.T) {
+	t.Parallel()
+	settings := conf.EqualizerSettings{
+		Enabled: true,
+		Filters: []conf.EqualizerFilter{
+			{Type: "HighPass", Frequency: 100, Q: 0.707, Passes: 1000},
+		},
+	}
+	chain := equalizer.BuildFilterChain(settings, 48000)
+	require.NotNil(t, chain)
+	require.Equal(t, 1, chain.Length())
+	assert.Equal(t, conf.MaxEQPasses, chain.Filters()[0].Passes())
+}

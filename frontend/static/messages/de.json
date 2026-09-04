@@ -3664,7 +3664,9 @@
           "flatResponse": "Flacher Frequenzgang (Keine Filter aktiv)",
           "frequency": "Frequenz (Hz)",
           "gain": "Verstärkung (dB)"
-        }
+        },
+        "advancedEqualizer": "Erweiterter Equalizer",
+        "advancedEqualizerHelp": "Mischpult-Editor mit allen Filtertypen (Shelf, parametrisch, Bandpass), Live-Abhören mit Echtzeit-Analyzer und Änderungen, die Sie vor dem Anwenden hören können."
       },
       "soundLevelMonitoring": {
         "title": "Schallpegelüberwachung",

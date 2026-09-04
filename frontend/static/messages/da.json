@@ -3664,7 +3664,9 @@
           "flatResponse": "Flad respons (ingen filtre anvendt)",
           "frequency": "Frekvens (Hz)",
           "gain": "Forstærkning (dB)"
-        }
+        },
+        "advancedEqualizer": "Avanceret equalizer",
+        "advancedEqualizerHelp": "Mixerpult-lignende editor med alle filtertyper (shelf, parametrisk, båndpas), live-medlytning med realtidsanalysator og ændringer du kan høre, før du anvender dem."
       },
       "soundLevelMonitoring": {
         "title": "Lydniveauovervågning",

@@ -3664,7 +3664,9 @@
           "flatResponse": "Plakana raksturlīkne (filtri nav lietoti)",
           "frequency": "Frekvence (Hz)",
           "gain": "Pastiprināšana (dB)"
-        }
+        },
+        "advancedEqualizer": "Paplašinātais ekvalaizers",
+        "advancedEqualizerHelp": "Mikšerpults stila redaktors ar visiem filtru tipiem (shelf, parametriskais, joslas caurlaide), tiešā monitorēšana ar reāllaika analizatoru un izmaiņas, ko var dzirdēt pirms lietošanas."
       },
       "soundLevelMonitoring": {
         "title": "Skaņas līmeņa monitorings",

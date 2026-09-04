@@ -238,15 +238,11 @@ describe('DSP Utilities', () => {
   });
 
   describe('calculateFilterResponse', () => {
-    it('should return 0dB when passes is 0', () => {
-      const filter: FilterConfig = {
-        type: 'LowPass',
-        frequency: 1000,
-        passes: 0,
-      };
-
-      const response = calculateFilterResponse(filter, 5000);
-      expect(response).toBe(0);
+    it('should treat zero passes as one pass, matching the backend builder', () => {
+      const zero: FilterConfig = { type: 'HighPass', frequency: 1000, q: 0.707, passes: 0 };
+      const one: FilterConfig = { ...zero, passes: 1 };
+      expect(calculateFilterResponse(zero, 100)).toBeCloseTo(calculateFilterResponse(one, 100), 6);
+      expect(calculateFilterResponse(zero, 100)).toBeLessThan(-20);
     });
 
     it('should return ~-3dB at cutoff for single pass LowPass', () => {

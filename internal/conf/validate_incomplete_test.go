@@ -611,7 +611,7 @@ func TestNormalizeEqualizers_KeepsInvalidValuesFatal(t *testing.T) {
 		{name: "zero frequency", filter: EqualizerFilter{Type: "LowPass", Q: 0.7},
 			expectError: "invalid frequency"},
 		{name: "frequency above maximum", filter: EqualizerFilter{Type: "LowPass", Frequency: MaxEQFrequency + 1, Q: 0.7},
-			expectError: "exceeds maximum"},
+			expectError: "Nyquist"},
 	}
 
 	for _, tt := range tests {

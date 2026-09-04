@@ -23,6 +23,7 @@
   import LowPassIcon from '$lib/desktop/components/ui/LowPassIcon.svelte';
   import HighPassIcon from '$lib/desktop/components/ui/HighPassIcon.svelte';
   import BandRejectIcon from '$lib/desktop/components/ui/BandRejectIcon.svelte';
+  import FilterIcon from '$lib/desktop/components/ui/FilterIcon.svelte';
   import FilterResponseGraph from './FilterResponseGraph.svelte';
   import { safeGet, safeArrayAccess } from '$lib/utils/security';
   import { t } from '$lib/i18n';
@@ -34,8 +35,8 @@
   const logger = loggers.settings;
 
   // Attenuation options for filter passes
+  // One pass is 12 dB/oct; zero is not offered because the audio path treats it as one pass.
   const attenuationOptions = [
-    { value: '0', label: '0dB' },
     { value: '1', label: '12dB' },
     { value: '2', label: '24dB' },
     { value: '3', label: '36dB' },
@@ -45,6 +46,7 @@
   // Fallback configuration used when API fails or returns invalid data
   const FALLBACK_EQ_FILTER_CONFIG = {
     LowPass: {
+      Simple: true,
       Parameters: [
         {
           Name: 'Frequency',
@@ -60,6 +62,7 @@
       ],
     },
     HighPass: {
+      Simple: true,
       Parameters: [
         {
           Name: 'Frequency',
@@ -75,6 +78,7 @@
       ],
     },
     BandReject: {
+      Simple: true,
       Parameters: [
         {
           Name: 'Frequency',
@@ -111,6 +115,8 @@
   }
 
   interface FilterTypeConfig {
+    /** Offered by the basic editor; the advanced editor lists every type */
+    Simple?: boolean;
     Parameters: FilterParameter[];
     Tooltip?: string;
   }
@@ -143,10 +149,12 @@
   interface Props {
     equalizerSettings: EqualizerSettings;
     disabled?: boolean;
+    /** Offer every filter type (the advanced editor); otherwise only the basic ones */
+    advanced?: boolean;
     onUpdate: (_updatedSettings: EqualizerSettings) => void;
   }
 
-  let { equalizerSettings, disabled = false, onUpdate }: Props = $props();
+  let { equalizerSettings, disabled = false, advanced = false, onUpdate }: Props = $props();
 
   // Load filter config from backend
   let eqFilterConfig = $state<Record<string, FilterTypeConfig>>({});
@@ -175,11 +183,13 @@
       value: '',
       label: t('settings.audio.audioFilters.selectFilterType'),
     };
-    const typeOptions = Object.keys(eqFilterConfig).map(filterType => ({
-      value: filterType,
-      label: filterType,
-      icon: filterIconMap[filterType as keyof typeof filterIconMap],
-    }));
+    const typeOptions = Object.entries(eqFilterConfig)
+      .filter(([, cfg]) => advanced || cfg.Simple === true)
+      .map(([filterType]) => ({
+        value: filterType,
+        label: filterType,
+        icon: filterIconMap[filterType as keyof typeof filterIconMap] ?? FilterIcon,
+      }));
     return [placeholder, ...typeOptions];
   });
 

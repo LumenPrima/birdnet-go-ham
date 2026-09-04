@@ -3664,7 +3664,9 @@
           "flatResponse": "Charakterystyka płaska (Brak filtrów)",
           "frequency": "Częstotliwość (Hz)",
           "gain": "Wzmocnienie (dB)"
-        }
+        },
+        "advancedEqualizer": "Zaawansowany korektor",
+        "advancedEqualizerHelp": "Edytor w stylu konsoli mikserskiej ze wszystkimi typami filtrów (półkowe, parametryczne, pasmowoprzepustowe), odsłuch na żywo z analizatorem czasu rzeczywistego i zmiany słyszalne przed ich zastosowaniem."
       },
       "soundLevelMonitoring": {
         "title": "Monitorowanie Poziomu Dźwięku",
