@@ -3666,7 +3666,65 @@
           "gain": "Forstærkning (dB)"
         },
         "advancedEqualizer": "Avanceret equalizer",
-        "advancedEqualizerHelp": "Mixerpult-lignende editor med alle filtertyper (shelf, parametrisk, båndpas), live-medlytning med realtidsanalysator og ændringer du kan høre, før du anvender dem."
+        "advancedEqualizerHelp": "Mixerpult-lignende editor med alle filtertyper (shelf, parametrisk, båndpas), live-medlytning med realtidsanalysator og ændringer du kan høre, før du anvender dem.",
+        "console": {
+          "curveLabel": "Frekvensgang med realtidsspektrum",
+          "handleLabel": "Bånd {index}, {type} ved {frequency}. Piletaster flytter; Skift med op og ned ændrer bredden.",
+          "bandsActive": "Equalizer aktiv",
+          "compare": "Lyt til",
+          "saved": "Gemt",
+          "proposed": "Foreslået",
+          "unapplied": "Ændringer er endnu ikke anvendt på stationen",
+          "matchesStation": "Svarer til det, stationen kører",
+          "reset": "Nulstil til gemt",
+          "apply": "Anvend på station",
+          "applying": "Anvender…",
+          "nothingToApply": "Intet at anvende: de foreslåede bånd svarer til de gemte",
+          "addBand": "Tilføj bånd",
+          "pickTypeFirst": "Vælg først en båndtype",
+          "bandwidth": "Båndbredde",
+          "wide": "bred",
+          "noGainForType": "Denne båndtype har ingen forstærkning; den dæmper kun",
+          "noSlopeForType": "Stejlhed gælder kun for cuts og båndpas",
+          "enableBand": "Aktivér bånd",
+          "bypassBand": "Spring bånd over",
+          "columns": {
+            "type": "Type",
+            "frequency": "Frekvens (Hz)",
+            "gain": "Gain (dB)",
+            "shape": "Q / bredde",
+            "slope": "Stejlhed",
+            "on": "Til"
+          },
+          "types": {
+            "HighPass": "Low cut (højpas)",
+            "LowPass": "High cut (lavpas)",
+            "BandReject": "Notch",
+            "BandPass": "Båndpas",
+            "LowShelf": "Low shelf",
+            "HighShelf": "High shelf",
+            "Peaking": "Parametrisk (peak)"
+          },
+          "monitor": {
+            "source": "Kilde",
+            "mode": "Medlytningstilstand",
+            "raw": "Foreslået",
+            "rawHelp": "Hør den rå kilde med dine foreslåede bånd anvendt her, øjeblikkeligt",
+            "station": "Station",
+            "stationHelp": "Hør hvad stationen selv producerer med den anvendte equalizer (et par sekunder bagud)",
+            "listen": "Lyt",
+            "stop": "Stop",
+            "level": "Niveau",
+            "notListening": "Start medlytning for at styre lyden",
+            "noAccess": "Live-lyd er ikke tilgængelig for denne konto",
+            "disabled": "Indstillinger indlæses eller gemmes",
+            "noSources": "Ingen lydkilder kører",
+            "pickSource": "Vælg en kilde at lytte til",
+            "sourceNotRunning": "Denne kilde kører ikke lige nu",
+            "showWaterfall": "Vis vandfald",
+            "hideWaterfall": "Skjul vandfald"
+          }
+        }
       },
       "soundLevelMonitoring": {
         "title": "Lydniveauovervågning",

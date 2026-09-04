@@ -463,6 +463,7 @@
                 equalizerSettings={editEqualizer}
                 {disabled}
                 onUpdate={handleEqualizerUpdate}
+                sourceName={source.name}
               />
             </div>
           {/if}

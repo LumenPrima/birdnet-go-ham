@@ -670,6 +670,7 @@
                 equalizerSettings={editEqualizer}
                 {disabled}
                 onUpdate={handleEqualizerUpdate}
+                sourceName={stream.name}
               />
             </div>
           {/if}

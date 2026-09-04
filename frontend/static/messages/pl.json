@@ -3666,7 +3666,65 @@
           "gain": "Wzmocnienie (dB)"
         },
         "advancedEqualizer": "Zaawansowany korektor",
-        "advancedEqualizerHelp": "Edytor w stylu konsoli mikserskiej ze wszystkimi typami filtrów (półkowe, parametryczne, pasmowoprzepustowe), odsłuch na żywo z analizatorem czasu rzeczywistego i zmiany słyszalne przed ich zastosowaniem."
+        "advancedEqualizerHelp": "Edytor w stylu konsoli mikserskiej ze wszystkimi typami filtrów (półkowe, parametryczne, pasmowoprzepustowe), odsłuch na żywo z analizatorem czasu rzeczywistego i zmiany słyszalne przed ich zastosowaniem.",
+        "console": {
+          "curveLabel": "Charakterystyka częstotliwościowa z widmem w czasie rzeczywistym",
+          "handleLabel": "Pasmo {index}, {type} przy {frequency}. Strzałki przesuwają; Shift ze strzałkami góra/dół zmienia szerokość.",
+          "bandsActive": "Korektor aktywny",
+          "compare": "Odsłuch",
+          "saved": "Zapisane",
+          "proposed": "Proponowane",
+          "unapplied": "Zmiany nie zostały jeszcze zastosowane na stacji",
+          "matchesStation": "Zgodne z tym, czego używa stacja",
+          "reset": "Przywróć zapisane",
+          "apply": "Zastosuj na stacji",
+          "applying": "Stosowanie…",
+          "nothingToApply": "Nic do zastosowania: proponowane pasma są zgodne z zapisanymi",
+          "addBand": "Dodaj pasmo",
+          "pickTypeFirst": "Najpierw wybierz typ pasma",
+          "bandwidth": "Szerokość pasma",
+          "wide": "szerokości",
+          "noGainForType": "Ten typ pasma nie ma wzmocnienia; tylko tłumi",
+          "noSlopeForType": "Nachylenie dotyczy tylko cięć i filtrów pasmowoprzepustowych",
+          "enableBand": "Włącz pasmo",
+          "bypassBand": "Pomiń pasmo",
+          "columns": {
+            "type": "Typ",
+            "frequency": "Częstotliwość (Hz)",
+            "gain": "Wzmocnienie (dB)",
+            "shape": "Q / szerokość",
+            "slope": "Nachylenie",
+            "on": "Wł."
+          },
+          "types": {
+            "HighPass": "Odcięcie dołu (górnoprzepustowy)",
+            "LowPass": "Odcięcie góry (dolnoprzepustowy)",
+            "BandReject": "Notch",
+            "BandPass": "Pasmowoprzepustowy",
+            "LowShelf": "Półka dolna",
+            "HighShelf": "Półka górna",
+            "Peaking": "Parametryczny (peak)"
+          },
+          "monitor": {
+            "source": "Źródło",
+            "mode": "Tryb odsłuchu",
+            "raw": "Proponowane",
+            "rawHelp": "Słuchaj surowego źródła z proponowanymi pasmami zastosowanymi tutaj, natychmiast",
+            "station": "Stacja",
+            "stationHelp": "Słuchaj tego, co stacja sama wytwarza z zastosowanym korektorem (kilka sekund opóźnienia)",
+            "listen": "Słuchaj",
+            "stop": "Zatrzymaj",
+            "level": "Poziom",
+            "notListening": "Rozpocznij odsłuch, aby sterować dźwiękiem",
+            "noAccess": "Dźwięk na żywo nie jest dostępny dla tego konta",
+            "disabled": "Ustawienia są wczytywane lub zapisywane",
+            "noSources": "Żadne źródło dźwięku nie działa",
+            "pickSource": "Wybierz źródło do odsłuchu",
+            "sourceNotRunning": "To źródło obecnie nie działa",
+            "showWaterfall": "Pokaż wodospad",
+            "hideWaterfall": "Ukryj wodospad"
+          }
+        }
       },
       "soundLevelMonitoring": {
         "title": "Monitorowanie Poziomu Dźwięku",

@@ -3666,7 +3666,65 @@
           "gain": "Pastiprināšana (dB)"
         },
         "advancedEqualizer": "Paplašinātais ekvalaizers",
-        "advancedEqualizerHelp": "Mikšerpults stila redaktors ar visiem filtru tipiem (shelf, parametriskais, joslas caurlaide), tiešā monitorēšana ar reāllaika analizatoru un izmaiņas, ko var dzirdēt pirms lietošanas."
+        "advancedEqualizerHelp": "Mikšerpults stila redaktors ar visiem filtru tipiem (shelf, parametriskais, joslas caurlaide), tiešā monitorēšana ar reāllaika analizatoru un izmaiņas, ko var dzirdēt pirms lietošanas.",
+        "console": {
+          "curveLabel": "Frekvenču raksturlīkne ar reāllaika spektru",
+          "handleLabel": "Josla {index}, {type} pie {frequency}. Bultiņas pārvieto; Shift ar augšup/lejup maina platumu.",
+          "bandsActive": "Ekvalaizers aktīvs",
+          "compare": "Klausīties",
+          "saved": "Saglabāts",
+          "proposed": "Ieteiktais",
+          "unapplied": "Izmaiņas vēl nav lietotas stacijā",
+          "matchesStation": "Atbilst tam, ko stacija lieto",
+          "reset": "Atjaunot saglabāto",
+          "apply": "Lietot stacijā",
+          "applying": "Lieto…",
+          "nothingToApply": "Nav ko lietot: ieteiktās joslas sakrīt ar saglabātajām",
+          "addBand": "Pievienot joslu",
+          "pickTypeFirst": "Vispirms izvēlieties joslas tipu",
+          "bandwidth": "Joslas platums",
+          "wide": "plats",
+          "noGainForType": "Šim joslas tipam nav pastiprinājuma; tas tikai griež",
+          "noSlopeForType": "Slīpums attiecas tikai uz griezumiem un joslas caurlaidēm",
+          "enableBand": "Ieslēgt joslu",
+          "bypassBand": "Apiet joslu",
+          "columns": {
+            "type": "Tips",
+            "frequency": "Frekvence (Hz)",
+            "gain": "Pastiprinājums (dB)",
+            "shape": "Q / platums",
+            "slope": "Slīpums",
+            "on": "Iesl."
+          },
+          "types": {
+            "HighPass": "Zemo griezums (augstfrekvenču caurlaide)",
+            "LowPass": "Augsto griezums (zemfrekvenču caurlaide)",
+            "BandReject": "Notch",
+            "BandPass": "Joslas caurlaide",
+            "LowShelf": "Zemais shelf",
+            "HighShelf": "Augstais shelf",
+            "Peaking": "Parametriskais (pīķis)"
+          },
+          "monitor": {
+            "source": "Avots",
+            "mode": "Monitorēšanas režīms",
+            "raw": "Ieteiktais",
+            "rawHelp": "Klausieties neapstrādāto avotu ar šeit lietotajām ieteiktajām joslām, uzreiz",
+            "station": "Stacija",
+            "stationHelp": "Klausieties, ko stacija pati veido ar lietoto ekvalaizeru (dažu sekunžu aizture)",
+            "listen": "Klausīties",
+            "stop": "Apturēt",
+            "level": "Līmenis",
+            "notListening": "Sāciet klausīties, lai vadītu skaņu",
+            "noAccess": "Tiešraides audio šim kontam nav pieejams",
+            "disabled": "Iestatījumi tiek ielādēti vai saglabāti",
+            "noSources": "Nav aktīvu audio avotu",
+            "pickSource": "Izvēlieties avotu klausīšanai",
+            "sourceNotRunning": "Šis avots pašlaik nedarbojas",
+            "showWaterfall": "Rādīt ūdenskritumu",
+            "hideWaterfall": "Slēpt ūdenskritumu"
+          }
+        }
       },
       "soundLevelMonitoring": {
         "title": "Skaņas līmeņa monitorings",

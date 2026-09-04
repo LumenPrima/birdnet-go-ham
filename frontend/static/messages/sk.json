@@ -3666,7 +3666,65 @@
           "gain": "Zisk (dB)"
         },
         "advancedEqualizer": "Pokročilý ekvalizér",
-        "advancedEqualizerHelp": "Editor v štýle mixážneho pultu so všetkými typmi filtrov (shelf, parametrický, pásmová priepusť), živé monitorovanie s analyzátorom v reálnom čase a zmeny, ktoré počujete pred ich použitím."
+        "advancedEqualizerHelp": "Editor v štýle mixážneho pultu so všetkými typmi filtrov (shelf, parametrický, pásmová priepusť), živé monitorovanie s analyzátorom v reálnom čase a zmeny, ktoré počujete pred ich použitím.",
+        "console": {
+          "curveLabel": "Frekvenčná odozva so spektrom v reálnom čase",
+          "handleLabel": "Pásmo {index}, {type} na {frequency}. Šípky posúvajú; Shift so šípkami hore a dole mení šírku.",
+          "bandsActive": "Ekvalizér aktívny",
+          "compare": "Počúvať",
+          "saved": "Uložené",
+          "proposed": "Navrhované",
+          "unapplied": "Zmeny ešte neboli použité na stanici",
+          "matchesStation": "Zodpovedá tomu, čo stanica používa",
+          "reset": "Obnoviť uložené",
+          "apply": "Použiť na stanici",
+          "applying": "Používa sa…",
+          "nothingToApply": "Nie je čo použiť: navrhované pásma zodpovedajú uloženým",
+          "addBand": "Pridať pásmo",
+          "pickTypeFirst": "Najprv vyberte typ pásma",
+          "bandwidth": "Šírka pásma",
+          "wide": "široké",
+          "noGainForType": "Tento typ pásma nemá zisk; iba tlmí",
+          "noSlopeForType": "Strmosť platí len pre rezy a pásmové priepuste",
+          "enableBand": "Zapnúť pásmo",
+          "bypassBand": "Obísť pásmo",
+          "columns": {
+            "type": "Typ",
+            "frequency": "Frekvencia (Hz)",
+            "gain": "Zisk (dB)",
+            "shape": "Q / šírka",
+            "slope": "Strmosť",
+            "on": "Zap."
+          },
+          "types": {
+            "HighPass": "Dolný rez (horná priepusť)",
+            "LowPass": "Horný rez (dolná priepusť)",
+            "BandReject": "Notch",
+            "BandPass": "Pásmová priepusť",
+            "LowShelf": "Nízky shelf",
+            "HighShelf": "Vysoký shelf",
+            "Peaking": "Parametrický (peak)"
+          },
+          "monitor": {
+            "source": "Zdroj",
+            "mode": "Režim monitorovania",
+            "raw": "Navrhované",
+            "rawHelp": "Počúvajte surový zdroj s navrhovanými pásmami použitými tu, okamžite",
+            "station": "Stanica",
+            "stationHelp": "Počúvajte, čo stanica sama produkuje s použitým ekvalizérom (o niekoľko sekúnd pozadu)",
+            "listen": "Počúvať",
+            "stop": "Zastaviť",
+            "level": "Úroveň",
+            "notListening": "Spustite počúvanie na ovládanie zvuku",
+            "noAccess": "Živý zvuk nie je pre tento účet dostupný",
+            "disabled": "Nastavenia sa načítavajú alebo ukladajú",
+            "noSources": "Nebežia žiadne zdroje zvuku",
+            "pickSource": "Vyberte zdroj na počúvanie",
+            "sourceNotRunning": "Tento zdroj momentálne nebeží",
+            "showWaterfall": "Zobraziť vodopád",
+            "hideWaterfall": "Skryť vodopád"
+          }
+        }
       },
       "soundLevelMonitoring": {
         "title": "Monitorovanie úrovne zvuku",

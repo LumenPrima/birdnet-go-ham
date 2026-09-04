@@ -182,3 +182,5 @@ The following components are located in their feature directories:
 
 - `RootLayout.svelte` - Root layout wrapper
 - `DesktopSidebar.svelte` - Navigation sidebar
+
+- `BandPassIcon`, `LowShelfIcon`, `HighShelfIcon`, `PeakingIcon` - filter type glyphs for the advanced equalizer (same style as `HighPassIcon`)

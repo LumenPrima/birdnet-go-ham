@@ -27,6 +27,7 @@ vi.mock('$lib/stores/appState.svelte', () => ({
     },
   },
   getCsrfToken: vi.fn().mockReturnValue('mock-csrf-token'),
+  hasLiveAudioAccess: () => true,
   isSentryEnabled: () => false,
   refreshCsrfToken: vi.fn().mockResolvedValue(false),
   initApp: vi.fn().mockResolvedValue(true),
@@ -242,7 +243,7 @@ describe('AudioEqualizerSettings advanced gating', () => {
     await waitFor(() => {
       expect(screen.getAllByRole('option').length).toBeGreaterThan(0);
     });
-    return screen.getAllByRole('option').map(o => o.textContent?.trim() ?? '');
+    return screen.getAllByRole('option').map(o => o.textContent.trim());
   }
 
   it('offers only the basic filter types when advanced is off', async () => {
@@ -251,9 +252,18 @@ describe('AudioEqualizerSettings advanced gating', () => {
     expect(types).not.toContain('Peaking');
   });
 
-  it('offers every filter type when advanced is on', async () => {
-    const types = await offeredTypes(true);
-    expect(types).toContain('LowPass');
-    expect(types).toContain('Peaking');
+  it('shows the console editor when advanced is on', async () => {
+    render(AudioEqualizerSettings, {
+      props: {
+        equalizerSettings: { enabled: true, filters: [] },
+        disabled: false,
+        advanced: true,
+        onUpdate: vi.fn(),
+      },
+    });
+    await waitFor(() => {
+      expect(screen.getByText('settings.audio.audioFilters.console.apply')).toBeInTheDocument();
+    });
+    expect(screen.queryByText('settings.audio.audioFilters.newFilterType')).not.toBeInTheDocument();
   });
 });

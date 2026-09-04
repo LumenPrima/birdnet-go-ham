@@ -3666,7 +3666,65 @@
           "gain": "Vahvistus (dB)"
         },
         "advancedEqualizer": "Edistynyt taajuuskorjain",
-        "advancedEqualizerHelp": "Mikserityylinen editori kaikilla suodintyypeillä (hylly, parametrinen, kaistanpäästö), suora monitorointi reaaliaikaisella analysaattorilla ja muutokset, jotka kuulet ennen käyttöönottoa."
+        "advancedEqualizerHelp": "Mikserityylinen editori kaikilla suodintyypeillä (hylly, parametrinen, kaistanpäästö), suora monitorointi reaaliaikaisella analysaattorilla ja muutokset, jotka kuulet ennen käyttöönottoa.",
+        "console": {
+          "curveLabel": "Taajuusvaste reaaliaikaisella spektrillä",
+          "handleLabel": "Kaista {index}, {type} taajuudella {frequency}. Nuolinäppäimet siirtävät; Vaihto ylös/alas muuttaa leveyttä.",
+          "bandsActive": "Taajuuskorjain käytössä",
+          "compare": "Kuuntele",
+          "saved": "Tallennettu",
+          "proposed": "Ehdotettu",
+          "unapplied": "Muutoksia ei ole vielä otettu käyttöön asemalla",
+          "matchesStation": "Vastaa aseman käyttämää",
+          "reset": "Palauta tallennettu",
+          "apply": "Ota käyttöön asemalla",
+          "applying": "Otetaan käyttöön…",
+          "nothingToApply": "Ei mitään otettavaa käyttöön: ehdotetut kaistat vastaavat tallennettuja",
+          "addBand": "Lisää kaista",
+          "pickTypeFirst": "Valitse ensin kaistan tyyppi",
+          "bandwidth": "Kaistanleveys",
+          "wide": "leveä",
+          "noGainForType": "Tällä kaistatyypillä ei ole vahvistusta; se vain leikkaa",
+          "noSlopeForType": "Jyrkkyys koskee vain leikkauksia ja kaistanpäästöjä",
+          "enableBand": "Ota kaista käyttöön",
+          "bypassBand": "Ohita kaista",
+          "columns": {
+            "type": "Tyyppi",
+            "frequency": "Taajuus (Hz)",
+            "gain": "Vahvistus (dB)",
+            "shape": "Q / leveys",
+            "slope": "Jyrkkyys",
+            "on": "Päällä"
+          },
+          "types": {
+            "HighPass": "Alaleikkaus (ylipäästö)",
+            "LowPass": "Yläleikkaus (alipäästö)",
+            "BandReject": "Notch",
+            "BandPass": "Kaistanpäästö",
+            "LowShelf": "Alahylly",
+            "HighShelf": "Ylähylly",
+            "Peaking": "Parametrinen (huippu)"
+          },
+          "monitor": {
+            "source": "Lähde",
+            "mode": "Monitorointitila",
+            "raw": "Ehdotettu",
+            "rawHelp": "Kuuntele raakaa lähdettä ehdotetuilla kaistoilla tässä, heti",
+            "station": "Asema",
+            "stationHelp": "Kuuntele mitä asema itse tuottaa käytössä olevalla taajuuskorjaimella (muutaman sekunnin viiveellä)",
+            "listen": "Kuuntele",
+            "stop": "Pysäytä",
+            "level": "Taso",
+            "notListening": "Aloita kuuntelu ohjataksesi ääntä",
+            "noAccess": "Suora ääni ei ole käytettävissä tällä tilillä",
+            "disabled": "Asetuksia ladataan tai tallennetaan",
+            "noSources": "Äänilähteitä ei ole käynnissä",
+            "pickSource": "Valitse kuunneltava lähde",
+            "sourceNotRunning": "Tämä lähde ei ole käynnissä juuri nyt",
+            "showWaterfall": "Näytä vesiputous",
+            "hideWaterfall": "Piilota vesiputous"
+          }
+        }
       },
       "soundLevelMonitoring": {
         "title": "Äänitason seuranta",

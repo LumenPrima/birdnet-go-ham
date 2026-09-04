@@ -3666,7 +3666,65 @@
           "gain": "Ganancia (dB)"
         },
         "advancedEqualizer": "Ecualizador avanzado",
-        "advancedEqualizerHelp": "Editor tipo mesa de mezclas con todos los tipos de filtro (shelf, paramétrico, paso banda), monitorización en directo con analizador en tiempo real y cambios que puede escuchar antes de aplicarlos."
+        "advancedEqualizerHelp": "Editor tipo mesa de mezclas con todos los tipos de filtro (shelf, paramétrico, paso banda), monitorización en directo con analizador en tiempo real y cambios que puede escuchar antes de aplicarlos.",
+        "console": {
+          "curveLabel": "Respuesta en frecuencia con espectro en tiempo real",
+          "handleLabel": "Banda {index}, {type} en {frequency}. Las flechas mueven; Mayús con arriba y abajo cambia el ancho.",
+          "bandsActive": "Ecualizador activo",
+          "compare": "Escuchar",
+          "saved": "Guardado",
+          "proposed": "Propuesto",
+          "unapplied": "Cambios aún no aplicados a la estación",
+          "matchesStation": "Coincide con lo que usa la estación",
+          "reset": "Restablecer a guardado",
+          "apply": "Aplicar a la estación",
+          "applying": "Aplicando…",
+          "nothingToApply": "Nada que aplicar: las bandas propuestas coinciden con las guardadas",
+          "addBand": "Añadir banda",
+          "pickTypeFirst": "Elija primero un tipo de banda",
+          "bandwidth": "Ancho de banda",
+          "wide": "de ancho",
+          "noGainForType": "Este tipo de banda no tiene ganancia; solo atenúa",
+          "noSlopeForType": "La pendiente solo se aplica a cortes y paso banda",
+          "enableBand": "Activar banda",
+          "bypassBand": "Omitir banda",
+          "columns": {
+            "type": "Tipo",
+            "frequency": "Frecuencia (Hz)",
+            "gain": "Ganancia (dB)",
+            "shape": "Q / ancho",
+            "slope": "Pendiente",
+            "on": "Act."
+          },
+          "types": {
+            "HighPass": "Corte de graves (paso alto)",
+            "LowPass": "Corte de agudos (paso bajo)",
+            "BandReject": "Notch",
+            "BandPass": "Paso banda",
+            "LowShelf": "Shelf grave",
+            "HighShelf": "Shelf agudo",
+            "Peaking": "Paramétrico (pico)"
+          },
+          "monitor": {
+            "source": "Fuente",
+            "mode": "Modo de monitor",
+            "raw": "Propuesto",
+            "rawHelp": "Escuche la fuente sin procesar con sus bandas propuestas aplicadas aquí, al instante",
+            "station": "Estación",
+            "stationHelp": "Escuche lo que la estación produce con el ecualizador aplicado (unos segundos de retraso)",
+            "listen": "Escuchar",
+            "stop": "Detener",
+            "level": "Nivel",
+            "notListening": "Empiece a escuchar para controlar el audio",
+            "noAccess": "El audio en directo no está disponible para esta cuenta",
+            "disabled": "La configuración se está cargando o guardando",
+            "noSources": "No hay fuentes de audio en ejecución",
+            "pickSource": "Elija una fuente para escuchar",
+            "sourceNotRunning": "Esta fuente no está en ejecución ahora",
+            "showWaterfall": "Mostrar cascada",
+            "hideWaterfall": "Ocultar cascada"
+          }
+        }
       },
       "soundLevelMonitoring": {
         "title": "Monitoreo del nivel de sonido",

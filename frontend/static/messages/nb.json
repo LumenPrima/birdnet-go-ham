@@ -3666,7 +3666,65 @@
           "gain": "Forsterkning (dB)"
         },
         "advancedEqualizer": "Avansert equalizer",
-        "advancedEqualizerHelp": "Miksebord-lignende redigering med alle filtertyper (shelf, parametrisk, båndpass), direkte medlytting med sanntidsanalysator og endringer du kan høre før du tar dem i bruk."
+        "advancedEqualizerHelp": "Miksebord-lignende redigering med alle filtertyper (shelf, parametrisk, båndpass), direkte medlytting med sanntidsanalysator og endringer du kan høre før du tar dem i bruk.",
+        "console": {
+          "curveLabel": "Frekvensrespons med sanntidsspektrum",
+          "handleLabel": "Bånd {index}, {type} ved {frequency}. Piltaster flytter; Skift med opp og ned endrer bredden.",
+          "bandsActive": "Equalizer aktiv",
+          "compare": "Lytt til",
+          "saved": "Lagret",
+          "proposed": "Foreslått",
+          "unapplied": "Endringer er ennå ikke tatt i bruk på stasjonen",
+          "matchesStation": "Samsvarer med det stasjonen kjører",
+          "reset": "Tilbakestill til lagret",
+          "apply": "Ta i bruk på stasjonen",
+          "applying": "Tar i bruk…",
+          "nothingToApply": "Ingenting å ta i bruk: de foreslåtte båndene samsvarer med de lagrede",
+          "addBand": "Legg til bånd",
+          "pickTypeFirst": "Velg en båndtype først",
+          "bandwidth": "Båndbredde",
+          "wide": "bred",
+          "noGainForType": "Denne båndtypen har ingen forsterkning; den demper bare",
+          "noSlopeForType": "Bratthet gjelder bare kutt og båndpass",
+          "enableBand": "Aktiver bånd",
+          "bypassBand": "Hopp over bånd",
+          "columns": {
+            "type": "Type",
+            "frequency": "Frekvens (Hz)",
+            "gain": "Gain (dB)",
+            "shape": "Q / bredde",
+            "slope": "Bratthet",
+            "on": "På"
+          },
+          "types": {
+            "HighPass": "Low cut (høypass)",
+            "LowPass": "High cut (lavpass)",
+            "BandReject": "Notch",
+            "BandPass": "Båndpass",
+            "LowShelf": "Low shelf",
+            "HighShelf": "High shelf",
+            "Peaking": "Parametrisk (peak)"
+          },
+          "monitor": {
+            "source": "Kilde",
+            "mode": "Medlyttingsmodus",
+            "raw": "Foreslått",
+            "rawHelp": "Hør den rå kilden med dine foreslåtte bånd brukt her, umiddelbart",
+            "station": "Stasjon",
+            "stationHelp": "Hør hva stasjonen selv produserer med equalizeren som er tatt i bruk (noen sekunder etter)",
+            "listen": "Lytt",
+            "stop": "Stopp",
+            "level": "Nivå",
+            "notListening": "Start medlytting for å styre lyden",
+            "noAccess": "Direktelyd er ikke tilgjengelig for denne kontoen",
+            "disabled": "Innstillinger lastes eller lagres",
+            "noSources": "Ingen lydkilder kjører",
+            "pickSource": "Velg en kilde å lytte til",
+            "sourceNotRunning": "Denne kilden kjører ikke akkurat nå",
+            "showWaterfall": "Vis foss",
+            "hideWaterfall": "Skjul foss"
+          }
+        }
       },
       "soundLevelMonitoring": {
         "title": "Lydnivåovervåkning",

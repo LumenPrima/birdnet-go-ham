@@ -3666,7 +3666,65 @@
           "gain": "Gain (dB)"
         },
         "advancedEqualizer": "Advanced equalizer",
-        "advancedEqualizerHelp": "Console-style editor with every filter type (shelves, parametric, band-pass), live monitoring with a real-time analyzer, and changes you can hear before applying them."
+        "advancedEqualizerHelp": "Console-style editor with every filter type (shelves, parametric, band-pass), live monitoring with a real-time analyzer, and changes you can hear before applying them.",
+        "console": {
+          "curveLabel": "Frequency response with real-time spectrum",
+          "handleLabel": "Band {index}, {type} at {frequency}. Arrow keys move; shift with up and down changes the width.",
+          "bandsActive": "Equalizer active",
+          "compare": "Listen to",
+          "saved": "Saved",
+          "proposed": "Proposed",
+          "unapplied": "Changes not yet applied to the station",
+          "matchesStation": "Matches what the station runs",
+          "reset": "Reset to saved",
+          "apply": "Apply to station",
+          "applying": "Applying…",
+          "nothingToApply": "Nothing to apply: the proposed bands match the saved ones",
+          "addBand": "Add band",
+          "pickTypeFirst": "Choose a band type first",
+          "bandwidth": "Bandwidth",
+          "wide": "wide",
+          "noGainForType": "This band type has no gain; it only cuts",
+          "noSlopeForType": "Slope applies to cuts and band passes only",
+          "enableBand": "Enable band",
+          "bypassBand": "Bypass band",
+          "columns": {
+            "type": "Type",
+            "frequency": "Frequency (Hz)",
+            "gain": "Gain (dB)",
+            "shape": "Q / width",
+            "slope": "Slope",
+            "on": "On"
+          },
+          "types": {
+            "HighPass": "Low cut (high pass)",
+            "LowPass": "High cut (low pass)",
+            "BandReject": "Notch",
+            "BandPass": "Band pass",
+            "LowShelf": "Low shelf",
+            "HighShelf": "High shelf",
+            "Peaking": "Parametric (peak)"
+          },
+          "monitor": {
+            "source": "Source",
+            "mode": "Monitor mode",
+            "raw": "Proposed",
+            "rawHelp": "Hear the raw source with your proposed bands applied here, instantly",
+            "station": "Station",
+            "stationHelp": "Hear what the station itself produces with the applied equalizer (a few seconds behind)",
+            "listen": "Listen",
+            "stop": "Stop",
+            "level": "Level",
+            "notListening": "Start listening to control the audio",
+            "noAccess": "Live audio is not available to this account",
+            "disabled": "Settings are loading or saving",
+            "noSources": "No audio sources are running",
+            "pickSource": "Choose a source to listen to",
+            "sourceNotRunning": "This source is not running right now",
+            "showWaterfall": "Show waterfall",
+            "hideWaterfall": "Hide waterfall"
+          }
+        }
       },
       "soundLevelMonitoring": {
         "title": "Sound Level Monitoring",

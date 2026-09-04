@@ -3666,7 +3666,65 @@
           "gain": "Versterking (dB)"
         },
         "advancedEqualizer": "Geavanceerde equalizer",
-        "advancedEqualizerHelp": "Mengpaneel-stijl editor met alle filtertypen (shelf, parametrisch, banddoorlaat), live meeluisteren met realtime-analyzer en wijzigingen die u hoort voordat u ze toepast."
+        "advancedEqualizerHelp": "Mengpaneel-stijl editor met alle filtertypen (shelf, parametrisch, banddoorlaat), live meeluisteren met realtime-analyzer en wijzigingen die u hoort voordat u ze toepast.",
+        "console": {
+          "curveLabel": "Frequentierespons met realtime spectrum",
+          "handleLabel": "Band {index}, {type} op {frequency}. Pijltoetsen verplaatsen; Shift met omhoog/omlaag wijzigt de breedte.",
+          "bandsActive": "Equalizer actief",
+          "compare": "Luisteren naar",
+          "saved": "Opgeslagen",
+          "proposed": "Voorgesteld",
+          "unapplied": "Wijzigingen nog niet toegepast op het station",
+          "matchesStation": "Komt overeen met wat het station gebruikt",
+          "reset": "Terug naar opgeslagen",
+          "apply": "Toepassen op station",
+          "applying": "Toepassen…",
+          "nothingToApply": "Niets toe te passen: de voorgestelde banden komen overeen met de opgeslagen",
+          "addBand": "Band toevoegen",
+          "pickTypeFirst": "Kies eerst een bandtype",
+          "bandwidth": "Bandbreedte",
+          "wide": "breed",
+          "noGainForType": "Dit bandtype heeft geen gain; het verzwakt alleen",
+          "noSlopeForType": "Steilheid geldt alleen voor cuts en banddoorlaten",
+          "enableBand": "Band inschakelen",
+          "bypassBand": "Band overslaan",
+          "columns": {
+            "type": "Type",
+            "frequency": "Frequentie (Hz)",
+            "gain": "Gain (dB)",
+            "shape": "Q / breedte",
+            "slope": "Steilheid",
+            "on": "Aan"
+          },
+          "types": {
+            "HighPass": "Low cut (hoogdoorlaat)",
+            "LowPass": "High cut (laagdoorlaat)",
+            "BandReject": "Notch",
+            "BandPass": "Banddoorlaat",
+            "LowShelf": "Low shelf",
+            "HighShelf": "High shelf",
+            "Peaking": "Parametrisch (piek)"
+          },
+          "monitor": {
+            "source": "Bron",
+            "mode": "Meeluistermodus",
+            "raw": "Voorgesteld",
+            "rawHelp": "Hoor de ruwe bron met uw voorgestelde banden hier toegepast, direct",
+            "station": "Station",
+            "stationHelp": "Hoor wat het station zelf produceert met de toegepaste equalizer (enkele seconden vertraagd)",
+            "listen": "Luisteren",
+            "stop": "Stop",
+            "level": "Niveau",
+            "notListening": "Start het meeluisteren om het geluid te regelen",
+            "noAccess": "Live-audio is niet beschikbaar voor dit account",
+            "disabled": "Instellingen worden geladen of opgeslagen",
+            "noSources": "Er draaien geen audiobronnen",
+            "pickSource": "Kies een bron om naar te luisteren",
+            "sourceNotRunning": "Deze bron draait op dit moment niet",
+            "showWaterfall": "Waterval tonen",
+            "hideWaterfall": "Waterval verbergen"
+          }
+        }
       },
       "soundLevelMonitoring": {
         "title": "Geluidsniveau Monitoring",

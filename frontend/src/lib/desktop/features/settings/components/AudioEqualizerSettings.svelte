@@ -24,6 +24,8 @@
   import HighPassIcon from '$lib/desktop/components/ui/HighPassIcon.svelte';
   import BandRejectIcon from '$lib/desktop/components/ui/BandRejectIcon.svelte';
   import FilterIcon from '$lib/desktop/components/ui/FilterIcon.svelte';
+  import EqConsole from './eq/EqConsole.svelte';
+  import { audioSettings } from '$lib/stores/settings';
   import FilterResponseGraph from './FilterResponseGraph.svelte';
   import { safeGet, safeArrayAccess } from '$lib/utils/security';
   import { t } from '$lib/i18n';
@@ -149,12 +151,17 @@
   interface Props {
     equalizerSettings: EqualizerSettings;
     disabled?: boolean;
-    /** Offer every filter type (the advanced editor); otherwise only the basic ones */
+    /** Show the console editor with every filter type; defaults to the global advanced setting */
     advanced?: boolean;
+    /** Config display name when this is a per-source equalizer (pins the console monitor to it) */
+    sourceName?: string;
     onUpdate: (_updatedSettings: EqualizerSettings) => void;
   }
 
-  let { equalizerSettings, disabled = false, advanced = false, onUpdate }: Props = $props();
+  let { equalizerSettings, disabled = false, advanced, sourceName, onUpdate }: Props = $props();
+
+  // Per-source cards do not carry the flag; they follow the global equalizer setting.
+  const consoleOn = $derived(advanced ?? $audioSettings?.equalizer.advanced ?? false);
 
   // Load filter config from backend
   let eqFilterConfig = $state<Record<string, FilterTypeConfig>>({});
@@ -171,6 +178,19 @@
   });
 
   // Map filter types to their icon components
+  const EQ_TYPES: readonly EqualizerFilterType[] = [
+    'HighPass',
+    'LowPass',
+    'BandReject',
+    'BandPass',
+    'LowShelf',
+    'HighShelf',
+    'Peaking',
+  ];
+  function isEqualizerFilterType(value: string): value is EqualizerFilterType {
+    return EQ_TYPES.some(x => x === value);
+  }
+
   const filterIconMap = {
     LowPass: LowPassIcon,
     HighPass: HighPassIcon,
@@ -178,13 +198,17 @@
   };
 
   // Filter type options derived from config - with icons
+  const consoleTypes = $derived(
+    Object.keys(eqFilterConfig).filter((k): k is EqualizerFilterType => isEqualizerFilterType(k))
+  );
+
   let filterTypeOptions = $derived.by(() => {
     const placeholder = {
       value: '',
       label: t('settings.audio.audioFilters.selectFilterType'),
     };
     const typeOptions = Object.entries(eqFilterConfig)
-      .filter(([, cfg]) => advanced || cfg.Simple === true)
+      .filter(([, cfg]) => consoleOn || cfg.Simple === true)
       .map(([filterType]) => ({
         value: filterType,
         label: filterType,
@@ -425,7 +449,9 @@
     onchange={handleEqualizerToggle}
   />
 
-  {#if equalizerSettings.enabled && !loadingConfig}
+  {#if consoleOn && !loadingConfig}
+    <EqConsole {equalizerSettings} types={consoleTypes} {sourceName} {disabled} {onUpdate} />
+  {:else if equalizerSettings.enabled && !loadingConfig}
     <!-- Filter Response Visualization - Always visible to show current state -->
     <div class="mb-6">
       <h3 class="text-sm font-medium mb-2">

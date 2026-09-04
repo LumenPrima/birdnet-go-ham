@@ -2671,6 +2671,56 @@ export type TranslationKey =
   | 'settings.audio.audioFilters.graph.gain'
   | 'settings.audio.audioFilters.advancedEqualizer'
   | 'settings.audio.audioFilters.advancedEqualizerHelp'
+  | 'settings.audio.audioFilters.console.curveLabel'
+  | 'settings.audio.audioFilters.console.handleLabel' // params: index, type, frequency
+  | 'settings.audio.audioFilters.console.bandsActive'
+  | 'settings.audio.audioFilters.console.compare'
+  | 'settings.audio.audioFilters.console.saved'
+  | 'settings.audio.audioFilters.console.proposed'
+  | 'settings.audio.audioFilters.console.unapplied'
+  | 'settings.audio.audioFilters.console.matchesStation'
+  | 'settings.audio.audioFilters.console.reset'
+  | 'settings.audio.audioFilters.console.apply'
+  | 'settings.audio.audioFilters.console.applying'
+  | 'settings.audio.audioFilters.console.nothingToApply'
+  | 'settings.audio.audioFilters.console.addBand'
+  | 'settings.audio.audioFilters.console.pickTypeFirst'
+  | 'settings.audio.audioFilters.console.bandwidth'
+  | 'settings.audio.audioFilters.console.wide'
+  | 'settings.audio.audioFilters.console.noGainForType'
+  | 'settings.audio.audioFilters.console.noSlopeForType'
+  | 'settings.audio.audioFilters.console.enableBand'
+  | 'settings.audio.audioFilters.console.bypassBand'
+  | 'settings.audio.audioFilters.console.columns.type'
+  | 'settings.audio.audioFilters.console.columns.frequency'
+  | 'settings.audio.audioFilters.console.columns.gain'
+  | 'settings.audio.audioFilters.console.columns.shape'
+  | 'settings.audio.audioFilters.console.columns.slope'
+  | 'settings.audio.audioFilters.console.columns.on'
+  | 'settings.audio.audioFilters.console.types.HighPass'
+  | 'settings.audio.audioFilters.console.types.LowPass'
+  | 'settings.audio.audioFilters.console.types.BandReject'
+  | 'settings.audio.audioFilters.console.types.BandPass'
+  | 'settings.audio.audioFilters.console.types.LowShelf'
+  | 'settings.audio.audioFilters.console.types.HighShelf'
+  | 'settings.audio.audioFilters.console.types.Peaking'
+  | 'settings.audio.audioFilters.console.monitor.source'
+  | 'settings.audio.audioFilters.console.monitor.mode'
+  | 'settings.audio.audioFilters.console.monitor.raw'
+  | 'settings.audio.audioFilters.console.monitor.rawHelp'
+  | 'settings.audio.audioFilters.console.monitor.station'
+  | 'settings.audio.audioFilters.console.monitor.stationHelp'
+  | 'settings.audio.audioFilters.console.monitor.listen'
+  | 'settings.audio.audioFilters.console.monitor.stop'
+  | 'settings.audio.audioFilters.console.monitor.level'
+  | 'settings.audio.audioFilters.console.monitor.notListening'
+  | 'settings.audio.audioFilters.console.monitor.noAccess'
+  | 'settings.audio.audioFilters.console.monitor.disabled'
+  | 'settings.audio.audioFilters.console.monitor.noSources'
+  | 'settings.audio.audioFilters.console.monitor.pickSource'
+  | 'settings.audio.audioFilters.console.monitor.sourceNotRunning'
+  | 'settings.audio.audioFilters.console.monitor.showWaterfall'
+  | 'settings.audio.audioFilters.console.monitor.hideWaterfall'
   | 'settings.audio.soundLevelMonitoring.title'
   | 'settings.audio.soundLevelMonitoring.description'
   | 'settings.audio.soundLevelMonitoring.enable'
@@ -4490,6 +4540,11 @@ export type TranslationParams = {
   'settings.audio.streams.format.withSampleRate': {
     rate: string | number;
     channels: string | number;
+  };
+  'settings.audio.audioFilters.console.handleLabel': {
+    index: string | number;
+    type: string | number;
+    frequency: string | number;
   };
   'settings.audio.clipRecording.preCaptureHelp': { max: string | number };
   'settings.audio.clipRecording.bitrateHelp': { min: string | number; max: string | number };
